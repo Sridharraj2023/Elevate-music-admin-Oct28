@@ -23,10 +23,8 @@ function ProtectedRoute({ children, requiredRole, allowGuest = false }) {
       }
 
       try {
-        // Use absolute URL in development, relative in production
-        const apiUrl = import.meta.env.DEV 
-          ? 'http://localhost:5000/api' 
-          : '/api';
+        // Use environment variable for API URL
+        const apiUrl = import.meta.env.VITE_API_URL;
           
         const res = await axios.get(`${apiUrl}/users/profile`, {
           headers: { 
