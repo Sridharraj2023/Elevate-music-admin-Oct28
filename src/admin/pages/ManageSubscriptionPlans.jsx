@@ -33,8 +33,17 @@ function ManageSubscriptionPlans() {
   const fetchPlans = async () => {
     try {
       setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         credentials: 'include'
       });
       
@@ -63,6 +72,11 @@ function ManageSubscriptionPlans() {
     e.preventDefault();
     //Edit plan
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const url = editingPlan 
         ? `${apiUrl}/subscription-plans/admin/subscription-plans/${editingPlan._id}`
@@ -73,6 +87,7 @@ function ManageSubscriptionPlans() {
       const response = await fetch(url, {
         method,
         headers: {
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
         credentials: 'include',
@@ -120,9 +135,18 @@ function ManageSubscriptionPlans() {
     }
 
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         credentials: 'include'
       });
 
@@ -139,9 +163,18 @@ function ManageSubscriptionPlans() {
 
   const handleActivate = async (planId) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}/activate`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         credentials: 'include'
       });
 
@@ -158,9 +191,18 @@ function ManageSubscriptionPlans() {
 
   const handleSetDefault = async (planId) => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}/set-default`, {
         method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
         credentials: 'include'
       });
 
