@@ -34,7 +34,7 @@ function ManageSubscriptionPlans() {
     try {
       setLoading(true);
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
-      const response = await fetch(`${apiUrl}/api/subscription-plans/admin/subscription-plans`, {
+      const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans`, {
         credentials: 'include'
       });
       
@@ -65,8 +65,8 @@ function ManageSubscriptionPlans() {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
       const url = editingPlan 
-        ? `${apiUrl}/api/subscription-plans/admin/subscription-plans/${editingPlan._id}`
-        : `${apiUrl}/api/subscription-plans/admin/subscription-plans`;
+        ? `${apiUrl}/subscription-plans/admin/subscription-plans/${editingPlan._id}`
+        : `${apiUrl}/subscription-plans/admin/subscription-plans`;
       
       const method = editingPlan ? 'PUT' : 'POST';
       
@@ -121,7 +121,7 @@ function ManageSubscriptionPlans() {
 
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
-      const response = await fetch(`${apiUrl}/api/subscription-plans/admin/subscription-plans/${planId}`, {
+      const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
@@ -140,7 +140,7 @@ function ManageSubscriptionPlans() {
   const handleActivate = async (planId) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
-      const response = await fetch(`${apiUrl}/api/subscription-plans/admin/subscription-plans/${planId}/activate`, {
+      const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}/activate`, {
         method: 'PUT',
         credentials: 'include'
       });
@@ -159,7 +159,7 @@ function ManageSubscriptionPlans() {
   const handleSetDefault = async (planId) => {
     try {
       const apiUrl = import.meta.env.VITE_API_URL || 'https://elevate-backend-s28.onrender.com';
-      const response = await fetch(`${apiUrl}/api/subscription-plans/admin/subscription-plans/${planId}/set-default`, {
+      const response = await fetch(`${apiUrl}/subscription-plans/admin/subscription-plans/${planId}/set-default`, {
         method: 'PUT',
         credentials: 'include'
       });
