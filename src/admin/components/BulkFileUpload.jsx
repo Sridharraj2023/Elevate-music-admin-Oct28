@@ -170,6 +170,7 @@ const BulkFileUpload = ({ onUploadComplete }) => {
 
       <div className="file-selector">
         <input
+          id="file-input"
           ref={fileInputRef}
           type="file"
           multiple
