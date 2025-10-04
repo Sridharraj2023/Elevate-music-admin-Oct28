@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { showToast } from '../../utils/toast';
 import '../admin.css';
 import './ViewMusic.css';
+import BulkFileUpload from '../components/BulkFileUpload';
 
 function ViewMusic() {
   const [musicList, setMusicList] = useState([]);
@@ -28,6 +29,8 @@ function ViewMusic() {
   const [sortOption, setSortOption] = useState('alphabetical-asc');
   const [isLoading, setIsLoading] = useState(true);
   const [thumbnailLoading, setThumbnailLoading] = useState({});
+  const [fileStatus, setFileStatus] = useState({});
+  const [showBulkUpload, setShowBulkUpload] = useState(false);
   const audioRefs = useRef({});
   const musicRefs = useRef({});
   const containerRef = useRef(null);
@@ -35,6 +38,34 @@ function ViewMusic() {
   const suggestionsRef = useRef(null);
   const loadedImagesRef = useRef(new Set());
   const location = useLocation();
+
+  // Check if file exists on server
+  const checkFileStatus = async (fileUrl) => {
+    try {
+      const fullUrl = fileUrl.startsWith('/') 
+        ? `${import.meta.env.VITE_API_URL}${fileUrl}`
+        : fileUrl;
+      
+      const response = await fetch(fullUrl, { method: 'HEAD' });
+      return response.ok ? 'exists' : 'missing';
+    } catch (error) {
+      return 'error';
+    }
+  };
+
+  // Check all file statuses
+  const checkAllFileStatuses = async (musicList) => {
+    const statuses = {};
+    for (const music of musicList) {
+      if (music.fileUrl) {
+        statuses[music._id] = await checkFileStatus(music.fileUrl);
+      }
+      if (music.thumbnailUrl) {
+        statuses[`${music._id}_thumb`] = await checkFileStatus(music.thumbnailUrl);
+      }
+    }
+    setFileStatus(statuses);
+  };
 
   const fetchMusic = async () => {
     console.log('fetchMusic started, isLoading:', isLoading);
@@ -91,6 +122,10 @@ function ViewMusic() {
 
       setMusicList(musicRes.data);
       setCategories(categoriesRes.data);
+      
+      // Check file statuses after setting music list
+      await checkAllFileStatuses(musicRes.data);
+      
       setCurrentTimes(prev => ({
         ...prev,
         ...musicRes.data.reduce((acc, music) => {
@@ -518,6 +553,19 @@ const togglePlayPause = async (id) => {
         <p>No music found.</p>
       ) : (
         <>
+          {/* Bulk Upload Section */}
+          <div className="bulk-upload-section">
+            <button 
+              onClick={() => setShowBulkUpload(!showBulkUpload)}
+              className="toggle-bulk-upload-btn"
+            >
+              {showBulkUpload ? '📤 Hide Bulk Upload' : '🚀 Show Bulk Upload'}
+            </button>
+            {showBulkUpload && (
+              <BulkFileUpload onUploadComplete={fetchMusic} />
+            )}
+          </div>
+          
           <div className="search-sort-container" style={{ display: 'flex', gap: '20px', marginBottom: '20px', alignItems: 'center' }}>
             <div className="search-container" style={{ position: 'relative', flex: '1' }}>
               <input
@@ -690,6 +738,20 @@ const togglePlayPause = async (id) => {
                     <p>Artist: {music.artist}</p>
                     <p>Category: {music.category?.name || 'Unknown'}</p>
                     <p>Type: {music.categoryType?.name || 'None'}</p>
+                    
+                    {/* File Status Indicators */}
+                    <div className="file-status-indicators">
+                      {music.fileUrl && (
+                        <span className={`status-badge ${fileStatus[music._id] === 'exists' ? 'exists' : 'missing'}`}>
+                          Audio: {fileStatus[music._id] === 'exists' ? '✅' : '❌'}
+                        </span>
+                      )}
+                      {music.thumbnailUrl && (
+                        <span className={`status-badge ${fileStatus[`${music._id}_thumb`] === 'exists' ? 'exists' : 'missing'}`}>
+                          Image: {fileStatus[`${music._id}_thumb`] === 'exists' ? '✅' : '❌'}
+                        </span>
+                      )}
+                    </div>
                     <div className="custom-player">
                       <button
                         className="play-pause-btn"
