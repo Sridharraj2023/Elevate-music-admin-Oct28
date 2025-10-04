@@ -77,7 +77,7 @@ function ViewMusic() {
         return;
       }
       const [musicRes, categoriesRes] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_URL}/music`, {
+        axios.get(`${import.meta.env.VITE_API_URL}/music/admin`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }),
