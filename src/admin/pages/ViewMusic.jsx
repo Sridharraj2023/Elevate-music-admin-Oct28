@@ -38,13 +38,36 @@ function ViewMusic() {
   const suggestionsRef = useRef(null);
   const loadedImagesRef = useRef(new Set());
   const location = useLocation();
+  // Normalize URLs to always use the Render backend host
+  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const filesHost = apiBase.replace(/\/api$/, '');
+  const toProd = (url) => {
+    if (!url) return url;
+    try {
+      // If already absolute to our Render host, keep
+      if (url.startsWith('https://') || url.startsWith('http://')) {
+        // Replace any local IP/host with Render host
+        return url.replace(/^http:\/\/192\.168\.[0-9]+\.[0-9]+(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/localhost(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/127\.0\.0\.1(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/([a-zA-Z0-9.-]*local[a-zA-Z0-9.-]*)(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\//, 'https://');
+      }
+      // Relative uploads path
+      if (url.startsWith('/uploads/')) {
+        return `${filesHost}${url}`;
+      }
+      return url;
+    } catch (_) {
+      return url;
+    }
+  };
+
 
   // Check if file exists on server
   const checkFileStatus = async (fileUrl) => {
     try {
-      const fullUrl = fileUrl.startsWith('/') 
-        ? `${import.meta.env.VITE_API_URL}${fileUrl}`
-        : fileUrl;
+      const fullUrl = toProd(fileUrl);
       
       const response = await fetch(fullUrl, { method: 'HEAD' });
       return response.ok ? 'exists' : 'missing';
@@ -627,7 +650,7 @@ const togglePlayPause = async (id) => {
                           src={
                             editThumbnail 
                               ? URL.createObjectURL(editThumbnail)
-                              : music.thumbnailUrl || placeholderImage
+                              : (music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage)
                           }
                           alt="Thumbnail preview"
                           className="music-thumbnail"
@@ -727,7 +750,7 @@ const togglePlayPause = async (id) => {
                   <>
                     <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={music.thumbnailUrl || placeholderImage}
+                        src={music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}
@@ -786,9 +809,9 @@ const togglePlayPause = async (id) => {
                           ref={(el) => (audioRefs.current[music._id] = el)}
                           onTimeUpdate={() => handleTimeUpdate(music._id)}
                           onLoadedMetadata={() => handleLoadedMetadata(music._id)}
-                          onError={(e) => console.log('Audio failed:', music.fileUrl, e)}
+                          onError={(e) => console.log('Audio failed:', toProd(music.fileUrl), e)}
                         >
-                          <source src={music.fileUrl} type="audio/mpeg" />
+                          <source src={toProd(music.fileUrl)} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>
                       ) : (
