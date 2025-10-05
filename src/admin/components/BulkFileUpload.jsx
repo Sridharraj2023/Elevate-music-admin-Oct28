@@ -56,7 +56,7 @@ const BulkFileUpload = ({ onUploadComplete }) => {
         }));
 
         const formData = new FormData();
-        formData.append('audio', file); // Backend expects 'audio' field
+        formData.append('file', file); // Backend expects 'file' field
 
         // Simulate progress for better UX
         const progressInterval = setInterval(() => {
