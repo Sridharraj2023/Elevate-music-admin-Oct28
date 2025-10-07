@@ -15,6 +15,9 @@ function AddMusic() {
   const [thumbnail, setThumbnail] = useState(null);
   const [duration, setDuration] = useState(0);
   const [displayDuration, setDisplayDuration] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [fileSize, setFileSize] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,6 +45,14 @@ function AddMusic() {
     fetchCategories();
   }, []);
 
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+  };
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
@@ -50,13 +61,24 @@ function AddMusic() {
     const validExtensions = ['.mp3', '.wav'];
     const fileExtension = selectedFile.name.slice(((selectedFile.name.lastIndexOf(".") - 1) >>> 0) + 2).toLowerCase();
     
-    if (!validMimeTypes.includes(selectedFile.type) || !validExtensions.includes('.' + fileExtension)) {
+    if (!validMimeTypes.includes(selectedFile.type) && !validExtensions.includes('.' + fileExtension)) {
       showToast.error('Only MP3 and WAV files are allowed');
       setFile(null);
       setDuration(0);
       setDisplayDuration('');
+      setFileSize('');
       e.target.value = '';
       return;
+    }
+
+    // Show file size
+    const sizeFormatted = formatFileSize(selectedFile.size);
+    setFileSize(sizeFormatted);
+    
+    // Warn for very large files
+    const fileSizeInMB = selectedFile.size / (1024 * 1024);
+    if (fileSizeInMB > 500) {
+      showToast.warning(`Large file detected (${sizeFormatted}). Upload may take several minutes. Please be patient.`);
     }
 
     setFile(selectedFile);
@@ -74,6 +96,7 @@ function AddMusic() {
       setFile(null);
       setDuration(0);
       setDisplayDuration('');
+      setFileSize('');
       e.target.value = '';
     };
   };
@@ -148,6 +171,9 @@ function AddMusic() {
     formData.append('releaseDate', releaseDate);
 
     try {
+      setIsUploading(true);
+      setUploadProgress(0);
+      
       const token = localStorage.getItem('token');
       
 	const res = await axios.post(`${import.meta.env.VITE_API_URL}/music/create`, formData, {
@@ -156,9 +182,15 @@ function AddMusic() {
     			'Content-Type': 'multipart/form-data',
     			'Accept':'application/json'
 		  },
- 		 withCredentials:true
-	});
+        withCredentials: true,
+        timeout: 0, // No timeout for large files
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          setUploadProgress(percentCompleted);
+        }
+      });
 
+      setIsUploading(false);
       showToast.success('Music added successfully!');
       setTitle('');
       setArtist('');
@@ -166,6 +198,8 @@ function AddMusic() {
       setThumbnail(null);
       setDuration(0);
       setDisplayDuration('');
+      setFileSize('');
+      setUploadProgress(0);
       setReleaseDate(new Date().toISOString().split('T')[0]);
       if (categories.length > 0) {
         setCategory(categories[0]._id);
@@ -176,6 +210,8 @@ function AddMusic() {
         navigate(`/admin/view-music?newMusicId=${res.data._id}`);
       }, 1000);
     } catch (err) {
+      setIsUploading(false);
+      setUploadProgress(0);
       showToast.error(err.response?.data?.message || 'Failed to add music');
     }
   };
@@ -195,6 +231,7 @@ function AddMusic() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Enter music title"
+            disabled={isUploading}
             required
           />
         </div>
@@ -207,6 +244,7 @@ function AddMusic() {
             value={artist}
             onChange={(e) => setArtist(e.target.value)}
             placeholder="Enter artist name"
+            disabled={isUploading}
             required
           />
         </div>
@@ -217,6 +255,7 @@ function AddMusic() {
             className="form-control"
             value={category}
             onChange={handleCategoryChange}
+            disabled={isUploading}
             required
           >
             {categories.length === 0 ? (
@@ -237,7 +276,7 @@ function AddMusic() {
             className="form-control"
             value={categoryType}
             onChange={(e) => setCategoryType(e.target.value)}
-            disabled={selectedCategory.types.length === 0}
+            disabled={selectedCategory.types.length === 0 || isUploading}
             required
           >
             {selectedCategory.types.length === 0 ? (
@@ -259,8 +298,14 @@ function AddMusic() {
             type="file"
             accept="audio/mpeg,audio/wav"
             onChange={handleFileChange}
+            disabled={isUploading}
             required
           />
+          {fileSize && (
+            <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
+              File size: {fileSize}
+            </small>
+          )}
         </div>
 
         <div className="form-group">
@@ -270,6 +315,7 @@ function AddMusic() {
             type="file"
             accept="image/*"
             onChange={handleThumbnailChange}
+            disabled={isUploading}
             required
           />
         </div>
@@ -291,12 +337,56 @@ function AddMusic() {
             type="date"
             value={releaseDate}
             onChange={(e) => setReleaseDate(e.target.value)}
+            disabled={isUploading}
             required
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
-          Add Music
+        {isUploading && (
+          <div className="form-group" style={{ marginBottom: '20px' }}>
+            <label className="form-label">Upload Progress:</label>
+            <div style={{
+              width: '100%',
+              backgroundColor: '#e0e0e0',
+              borderRadius: '10px',
+              overflow: 'hidden',
+              height: '30px',
+              position: 'relative'
+            }}>
+              <div style={{
+                width: `${uploadProgress}%`,
+                backgroundColor: uploadProgress === 100 ? '#4CAF50' : '#2196F3',
+                height: '100%',
+                transition: 'width 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <span style={{ 
+                  color: 'white', 
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                  position: 'absolute',
+                  left: '50%',
+                  transform: 'translateX(-50%)'
+                }}>
+                  {uploadProgress}%
+                </span>
+              </div>
+            </div>
+            <small style={{ color: '#666', marginTop: '5px', display: 'block' }}>
+              {uploadProgress < 100 ? 'Uploading... Please do not close this page.' : 'Processing...'}
+            </small>
+          </div>
+        )}
+
+        <button 
+          type="submit" 
+          className="btn btn-primary"
+          disabled={isUploading}
+          style={{ opacity: isUploading ? 0.6 : 1, cursor: isUploading ? 'not-allowed' : 'pointer' }}
+        >
+          {isUploading ? 'Uploading...' : 'Add Music'}
         </button>
       </form>
     </div>
