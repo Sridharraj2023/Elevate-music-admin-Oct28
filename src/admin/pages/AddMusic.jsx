@@ -175,18 +175,29 @@ function AddMusic() {
       setUploadProgress(0);
       
       const token = localStorage.getItem('token');
+      const apiUrl = import.meta.env.VITE_API_URL;
       
-	const res = await axios.post(`${import.meta.env.VITE_API_URL}/music/create`, formData, {
-  		headers: {
-    			Authorization: `Bearer ${token}`,
-    			'Content-Type': 'multipart/form-data',
-    			'Accept':'application/json'
-		  },
+      // Debug logging for production troubleshooting
+      console.log('API URL:', apiUrl);
+      console.log('File size:', file.size, 'bytes');
+      console.log('Starting upload...');
+      
+      if (!apiUrl) {
+        throw new Error('API URL is not configured. Please check environment variables.');
+      }
+      
+      const res = await axios.post(`${apiUrl}/music/create`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+          'Accept':'application/json'
+        },
         withCredentials: true,
         timeout: 0, // No timeout for large files
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
           setUploadProgress(percentCompleted);
+          console.log(`Upload progress: ${percentCompleted}%`);
         }
       });
 
@@ -212,7 +223,33 @@ function AddMusic() {
     } catch (err) {
       setIsUploading(false);
       setUploadProgress(0);
-      showToast.error(err.response?.data?.message || 'Failed to add music');
+      
+      // Enhanced error logging for debugging
+      console.error('Upload error:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      
+      // User-friendly error messages
+      let errorMessage = 'Failed to add music';
+      
+      if (err.message === 'API URL is not configured. Please check environment variables.') {
+        errorMessage = 'Configuration error. Please contact administrator.';
+      } else if (err.message === 'Network Error') {
+        errorMessage = 'Network error. Please check your connection and try again.';
+      } else if (err.code === 'ECONNABORTED') {
+        errorMessage = 'Upload timeout. Please try a smaller file or check your connection.';
+      } else if (err.response?.status === 413) {
+        errorMessage = 'File is too large. Server cannot process files of this size.';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Session expired. Please login again.';
+      } else if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      }
+      
+      showToast.error(errorMessage);
     }
   };
 
