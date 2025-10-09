@@ -670,10 +670,13 @@ body {
 /* ================ Stripe Price Info Display ================ */
 .plan-stripe-info {
   margin-top: 1rem;
-  padding: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.25rem 2rem 1.25rem;
   background: #f8f9fa;
   border-radius: 8px;
   border: 1px solid #dee2e6;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stripe-price-id {
@@ -682,10 +685,12 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .stripe-price-id:last-child {
-  margin-bottom: 0;
+  margin-bottom: 0.5rem;
 }
 
 .stripe-price-id strong {
@@ -702,12 +707,14 @@ body {
   font-family: 'Courier New', monospace;
   font-size: 0.8rem;
   color: #495057;
-  word-break: break-word;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-block;
-  max-width: 100%;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: inline-block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  word-break: normal !important;
+  line-height: 1.2;
 }
 
 /* Form Section Title for Stripe IDs */

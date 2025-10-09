@@ -5,9 +5,11 @@
     align-items: center !important;
     min-height: 100vh !important;
     background-color: #f0f2f5;
-    width: 100% !important;
+    width: 100vw !important;
     box-sizing: border-box;
     padding: 20px;
+    margin: 0 !important;
+    position: relative;
   }
   
   .login-card {
@@ -17,10 +19,9 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     width: 100%;
     max-width: 400px;
-    margin: 0 auto !important;
+    margin: 0 !important;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
+    flex-shrink: 0;
   }
   
   .login-card h2 {
@@ -33,11 +34,14 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    text-align: center;
   }
   
   .login-card label {
     font-weight: 600;
     color: #555;
+    text-align: center;
+    display: block;
   }
   
   .login-card input {
@@ -47,6 +51,8 @@
     border-radius: 4px;
     font-size: 1rem;
     margin-top: 0.3rem;
+    text-align: center;
+    box-sizing: border-box;
   }
   
   .login-card input:focus {
