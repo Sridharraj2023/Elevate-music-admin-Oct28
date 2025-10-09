@@ -666,3 +666,58 @@ body {
     width: 100%;
   }
 }
+
+/* ================ Stripe Price Info Display ================ */
+.plan-stripe-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.stripe-price-id {
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.stripe-price-id:last-child {
+  margin-bottom: 0;
+}
+
+.stripe-price-id strong {
+  display: inline-block;
+  min-width: 140px;
+  color: var(--primary-color);
+}
+
+.stripe-price-id code {
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
+  color: #495057;
+  word-break: break-all;
+}
+
+/* Form Section Title for Stripe IDs */
+.form-section-title {
+  margin: 2rem 0 1rem 0;
+  padding: 1rem;
+  background: #e3f2fd;
+  border-radius: 8px;
+  border-left: 4px solid var(--info-color);
+}
+
+.form-section-title h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--info-color);
+  font-size: 1rem;
+}
+
+.form-section-title small {
+  color: #666;
+  font-size: 0.85rem;
+  display: block;
+}

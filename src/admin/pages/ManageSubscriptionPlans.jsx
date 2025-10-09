@@ -23,7 +23,9 @@ function ManageSubscriptionPlans() {
     customTrackRequests: 'No',
     description: '',
     features: '',
-    isDefault: false
+    isDefault: false,
+    stripeMonthlyPriceId: '',
+    stripeYearlyPriceId: ''
   });
 
   useEffect(() => {
@@ -124,7 +126,9 @@ function ManageSubscriptionPlans() {
       customTrackRequests: plan.customTrackRequests,
       description: plan.description || '',
       features: plan.features ? plan.features.join('\n') : '',
-      isDefault: plan.isDefault
+      isDefault: plan.isDefault,
+      stripeMonthlyPriceId: plan.stripeMonthlyPriceId || '',
+      stripeYearlyPriceId: plan.stripeYearlyPriceId || ''
     });
     setShowCreateForm(true);
   };
@@ -231,7 +235,9 @@ function ManageSubscriptionPlans() {
       customTrackRequests: 'No',
       description: '',
       features: '',
-      isDefault: false
+      isDefault: false,
+      stripeMonthlyPriceId: '',
+      stripeYearlyPriceId: ''
     });
     setEditingPlan(null);
     setShowCreateForm(false);
@@ -295,6 +301,34 @@ function ManageSubscriptionPlans() {
                     value={formData.annualCost}
                     onChange={handleInputChange}
                     required
+                  />
+                </div>
+              </div>
+
+              <div className="form-section-title">
+                <h4>Stripe Price IDs (Optional - Auto-generated if left empty)</h4>
+                <small>If you already created prices in Stripe, enter them here. Otherwise, they will be created automatically.</small>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Stripe Monthly Price ID</label>
+                  <input
+                    type="text"
+                    name="stripeMonthlyPriceId"
+                    value={formData.stripeMonthlyPriceId || ''}
+                    onChange={handleInputChange}
+                    placeholder="price_xxxxx (optional)"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Stripe Yearly Price ID</label>
+                  <input
+                    type="text"
+                    name="stripeYearlyPriceId"
+                    value={formData.stripeYearlyPriceId || ''}
+                    onChange={handleInputChange}
+                    placeholder="price_xxxxx (optional)"
                   />
                 </div>
               </div>
@@ -455,6 +489,17 @@ function ManageSubscriptionPlans() {
               <div className="feature"><strong>Binaural:</strong> {plan.binauralTracks}</div>
               <div className="feature"><strong>Soundscape:</strong> {plan.soundscapeTracks}</div>
               <div className="feature"><strong>Ads:</strong> {plan.adSupported}</div>
+            </div>
+
+            <div className="plan-stripe-info">
+              <div className="stripe-price-id">
+                <strong>Monthly Price ID:</strong> 
+                <code>{plan.stripeMonthlyPriceId || plan.stripePriceId || 'Not set'}</code>
+              </div>
+              <div className="stripe-price-id">
+                <strong>Yearly Price ID:</strong> 
+                <code>{plan.stripeYearlyPriceId || 'Not set'}</code>
+              </div>
             </div>
 
             <div className="plan-actions">
