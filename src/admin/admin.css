@@ -679,6 +679,9 @@ body {
 .stripe-price-id {
   margin-bottom: 0.75rem;
   font-size: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .stripe-price-id:last-child {
@@ -686,9 +689,10 @@ body {
 }
 
 .stripe-price-id strong {
-  display: inline-block;
-  min-width: 140px;
+  display: block;
+  margin-bottom: 0.25rem;
   color: var(--primary-color);
+  font-weight: 600;
 }
 
 .stripe-price-id code {
@@ -698,7 +702,12 @@ body {
   font-family: 'Courier New', monospace;
   font-size: 0.8rem;
   color: #495057;
-  word-break: break-all;
+  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  max-width: 100%;
 }
 
 /* Form Section Title for Stripe IDs */
