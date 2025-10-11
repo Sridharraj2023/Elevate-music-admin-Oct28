@@ -13,6 +13,7 @@ import ViewUsers from './admin/pages/ViewUsers.jsx';
 import ViewCategories from './admin/pages/ViewCategories.jsx';
 import ViewMusic from './admin/pages/ViewMusic.jsx';
 import ManageSubscriptionPlans from './admin/pages/ManageSubscriptionPlans.jsx';
+import ManageTermsConditions from './admin/pages/ManageTermsConditions.jsx';
 import UserLayout from './user/components/UserLayout.jsx';
 import UserDashboard from './user/pages/Dashboard.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -95,6 +96,7 @@ function App() {
           <Route path="view-music" element={<ViewMusic />} />
           <Route path="view-users" element={<ViewUsers />} />
           <Route path="manage-subscription-plans" element={<ManageSubscriptionPlans />} />
+          <Route path="manage-terms" element={<ManageTermsConditions />} />
         </Route>
         <Route
           path="/user/*"

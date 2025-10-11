@@ -55,6 +55,17 @@ function Dashboard() {
           </Link>
         </div>
       </div>
+
+      {/* Terms & Conditions Section */}
+      <div className="manage-section">
+        <h3>Manage Terms & Conditions</h3>
+        <div className="dashboard-grid">
+          <Link to="/admin/manage-terms" className="module-card">
+            <h4 className="module-title">Terms & Conditions</h4>
+            <p className="module-description">Create and manage terms & conditions versions.</p>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
