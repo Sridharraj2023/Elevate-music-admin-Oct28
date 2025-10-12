@@ -182,6 +182,10 @@ body {
   border: 2px solid transparent;
   text-decoration: none;
   color: inherit;
+  height: 140px; /* Fixed height for all cards */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .module-card:hover {
@@ -200,6 +204,12 @@ body {
   color: var(--text-color);
   opacity: 0.9;
   margin-bottom: 0;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
 
 /* ================ Tables ================ */
