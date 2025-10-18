@@ -1501,3 +1501,50 @@ body {
     display: none;
   }
 }
+
+/* ================= ViewUsers – subtle polish (non-breaking) ================= */
+.stat-card:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  transform: translateY(-2px);
+  transition: all 0.2s ease;
+}
+
+.btn-export {
+  position: relative;
+}
+
+/* Search suggestions dropdown used by ViewUsers.jsx */
+.suggestions-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.suggestion-item:hover,
+.suggestion-item.highlighted {
+  background: #f8f9ff;
+  color: #2c3e50;
+}
+
+/* Pagination spacing for existing markup */
+.pagination {
+  gap: 8px;
+}
