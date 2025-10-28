@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { showToast } from '../../utils/toast';
-import '../admin.css';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { showToast } from "../../utils/toast";
+import "../admin.css";
 
 function AddCategory() {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [types, setTypes] = useState([{ name: '', description: '' }]);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [types, setTypes] = useState([{ name: "", description: "" }]);
   const navigate = useNavigate();
 
   const handleTypeChange = (index, field, value) => {
@@ -17,7 +17,7 @@ function AddCategory() {
   };
 
   const addType = () => {
-    setTypes([...types, { name: '', description: '' }]);
+    setTypes([...types, { name: "", description: "" }]);
   };
 
   const removeType = (index) => {
@@ -34,13 +34,13 @@ function AddCategory() {
 
     // Check category name
     if (!name.trim()) {
-      showToast.error('Category name is required');
+      showToast.error("Category name is required");
       hasError = true;
     }
 
     // Check category description
     if (!description.trim()) {
-      showToast.error('Category description is required');
+      showToast.error("Category description is required");
       hasError = true;
     }
 
@@ -62,38 +62,42 @@ function AddCategory() {
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/categories/create`,
-        { 
-          name, 
-          description, 
-          types: types.filter(type => type.name.trim() && type.description.trim())
+        {
+          name,
+          description,
+          types: types.filter(
+            (type) => type.name.trim() && type.description.trim(),
+          ),
         },
         {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
-        }
+        },
       );
 
-      showToast.success('Category added successfully!');
-      setName('');
-      setDescription('');
-      setTypes([{ name: '', description: '' }]);
+      showToast.success("Category added successfully!");
+      setName("");
+      setDescription("");
+      setTypes([{ name: "", description: "" }]);
 
       // Redirect to ViewCategories with query params including the new category ID
       setTimeout(() => {
-        navigate(`/admin/view-categories?newCategory=true&categoryId=${res.data._id}`);
+        navigate(
+          `/admin/view-categories?newCategory=true&categoryId=${res.data._id}`,
+        );
       }, 1000);
     } catch (err) {
-      showToast.error(err.response?.data?.message || 'Failed to add category');
+      showToast.error(err.response?.data?.message || "Failed to add category");
     }
   };
 
   return (
     <div className="card">
       <h2 className="card-title">Add Category</h2>
-      
+
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label className="form-label">Category Name:</label>
@@ -106,7 +110,7 @@ function AddCategory() {
             required
           />
         </div>
-        
+
         <div className="form-group">
           <label className="form-label">Category Description:</label>
           <textarea
@@ -122,19 +126,27 @@ function AddCategory() {
         <div className="form-group">
           <label className="form-label">Category Types:</label>
           {types.map((type, index) => (
-            <div key={index} className="type-input-group" style={{ marginBottom: '15px' }}>
+            <div
+              key={index}
+              className="type-input-group"
+              style={{ marginBottom: "15px" }}
+            >
               <input
                 className="form-control"
                 type="text"
                 value={type.name}
-                onChange={(e) => handleTypeChange(index, 'name', e.target.value)}
+                onChange={(e) =>
+                  handleTypeChange(index, "name", e.target.value)
+                }
                 placeholder={`Type Name ${index + 1}`}
                 required
               />
               <textarea
                 className="form-control"
                 value={type.description}
-                onChange={(e) => handleTypeChange(index, 'description', e.target.value)}
+                onChange={(e) =>
+                  handleTypeChange(index, "description", e.target.value)
+                }
                 placeholder={`Type Description ${index + 1}`}
                 rows="2"
                 required
@@ -144,7 +156,7 @@ function AddCategory() {
                   type="button"
                   className="btn btn-danger"
                   onClick={() => removeType(index)}
-                  style={{ marginTop: '5px' }}
+                  style={{ marginTop: "5px" }}
                 >
                   Remove Type
                 </button>
@@ -155,12 +167,12 @@ function AddCategory() {
             type="button"
             className="btn btn-secondary"
             onClick={addType}
-            style={{ marginTop: '10px' }}
+            style={{ marginTop: "10px" }}
           >
             Add Another Type
           </button>
         </div>
-        
+
         <button type="submit" className="btn btn-primary">
           Add Category
         </button>

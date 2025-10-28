@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { showToast } from '../../utils/toast';
-import '../admin.css';
+import React, { useState, useEffect } from "react";
+import { showToast } from "../../utils/toast";
+import "../admin.css";
 
 function ManageDisclaimer() {
   const [disclaimers, setDisclaimers] = useState([]);
@@ -10,11 +10,11 @@ function ManageDisclaimer() {
   const [showPreview, setShowPreview] = useState(null);
 
   const [formData, setFormData] = useState({
-    title: 'Disclaimer',
-    content: '',
-    version: '',
-    effectiveDate: new Date().toISOString().split('T')[0],
-    documentType: 'disclaimer'
+    title: "Disclaimer",
+    content: "",
+    version: "",
+    effectiveDate: new Date().toISOString().split("T")[0],
+    documentType: "disclaimer",
   });
 
   useEffect(() => {
@@ -24,18 +24,18 @@ function ManageDisclaimer() {
   const fetchDisclaimers = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL;
-      
+
       const response = await fetch(`${apiUrl}/terms/admin/disclaimer`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
-      
-      if (!response.ok) throw new Error('Failed to fetch disclaimers');
-      
+
+      if (!response.ok) throw new Error("Failed to fetch disclaimers");
+
       const data = await response.json();
       setDisclaimers(data);
     } catch (err) {
@@ -47,87 +47,94 @@ function ManageDisclaimer() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL;
-      
-      const url = editingDisclaimer 
+
+      const url = editingDisclaimer
         ? `${apiUrl}/terms/admin/${editingDisclaimer._id}`
         : `${apiUrl}/terms/admin`;
-      
-      const method = editingDisclaimer ? 'PUT' : 'POST';
-      
+
+      const method = editingDisclaimer ? "PUT" : "POST";
+
       const response = await fetch(url, {
         method,
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to save disclaimer');
+        throw new Error(error.message || "Failed to save disclaimer");
       }
 
       await fetchDisclaimers();
       resetForm();
-      showToast.success(editingDisclaimer ? 'Disclaimer updated!' : 'Disclaimer created!');
+      showToast.success(
+        editingDisclaimer ? "Disclaimer updated!" : "Disclaimer created!",
+      );
     } catch (err) {
       showToast.error(err.message);
     }
   };
 
   const handlePublish = async (id) => {
-    if (!window.confirm('Publish this version as active? This will replace the current active disclaimer.')) return;
-    
+    if (
+      !window.confirm(
+        "Publish this version as active? This will replace the current active disclaimer.",
+      )
+    )
+      return;
+
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL;
-      
+
       const response = await fetch(`${apiUrl}/terms/admin/${id}/publish`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to publish');
+      if (!response.ok) throw new Error("Failed to publish");
 
       await fetchDisclaimers();
-      showToast.success('Disclaimer published successfully!');
+      showToast.success("Disclaimer published successfully!");
     } catch (err) {
       showToast.error(err.message);
     }
   };
 
   const handleUnpublish = async (id) => {
-    if (!window.confirm('Unpublish this version?')) return;
-    
+    if (!window.confirm("Unpublish this version?")) return;
+
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL;
-      
+
       const response = await fetch(`${apiUrl}/terms/admin/${id}/unpublish`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to unpublish');
+      if (!response.ok) throw new Error("Failed to unpublish");
 
       await fetchDisclaimers();
-      showToast.success('Disclaimer unpublished successfully!');
+      showToast.success("Disclaimer unpublished successfully!");
     } catch (err) {
       showToast.error(err.message);
     }
@@ -135,40 +142,47 @@ function ManageDisclaimer() {
 
   const handleEdit = (disclaimerItem) => {
     if (disclaimerItem.isActive) {
-      showToast.warning('Cannot edit active disclaimer. Create a new version instead.');
+      showToast.warning(
+        "Cannot edit active disclaimer. Create a new version instead.",
+      );
       return;
     }
-    
+
     setEditingDisclaimer(disclaimerItem);
     setFormData({
       title: disclaimerItem.title,
       content: disclaimerItem.content,
       version: disclaimerItem.version,
-      effectiveDate: new Date(disclaimerItem.effectiveDate).toISOString().split('T')[0],
-      documentType: 'disclaimer'
+      effectiveDate: new Date(disclaimerItem.effectiveDate)
+        .toISOString()
+        .split("T")[0],
+      documentType: "disclaimer",
     });
     setShowForm(true);
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this disclaimer version? This cannot be undone.')) return;
-    
+    if (
+      !window.confirm("Delete this disclaimer version? This cannot be undone.")
+    )
+      return;
+
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const apiUrl = import.meta.env.VITE_API_URL;
-      
+
       const response = await fetch(`${apiUrl}/terms/admin/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to delete');
+      if (!response.ok) throw new Error("Failed to delete");
 
       await fetchDisclaimers();
-      showToast.success('Disclaimer deleted successfully!');
+      showToast.success("Disclaimer deleted successfully!");
     } catch (err) {
       showToast.error(err.message);
     }
@@ -176,19 +190,21 @@ function ManageDisclaimer() {
 
   const resetForm = () => {
     setFormData({
-      title: 'Disclaimer',
-      content: '',
-      version: '',
-      effectiveDate: new Date().toISOString().split('T')[0],
-      documentType: 'disclaimer'
+      title: "Disclaimer",
+      content: "",
+      version: "",
+      effectiveDate: new Date().toISOString().split("T")[0],
+      documentType: "disclaimer",
     });
     setEditingDisclaimer(null);
     setShowForm(false);
   };
 
   const generateNextVersion = () => {
-    if (disclaimers.length === 0) return '1.0';
-    const versions = disclaimers.map(d => parseFloat(d.version)).filter(v => !isNaN(v));
+    if (disclaimers.length === 0) return "1.0";
+    const versions = disclaimers
+      .map((d) => parseFloat(d.version))
+      .filter((v) => !isNaN(v));
     const maxVersion = Math.max(...versions);
     return (maxVersion + 0.1).toFixed(1);
   };
@@ -236,13 +252,13 @@ function ManageDisclaimer() {
     <div className="admin-container">
       <div className="admin-header">
         <h2>Manage Disclaimer</h2>
-        <button 
+        <button
           className="btn btn-primary"
           onClick={() => {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               version: generateNextVersion(),
-              content: getDefaultDisclaimerContent()
+              content: getDefaultDisclaimerContent(),
             }));
             setShowForm(true);
           }}
@@ -256,10 +272,16 @@ function ManageDisclaimer() {
         <div className="modal-overlay">
           <div className="modal-content large">
             <div className="modal-header">
-              <h3>{editingDisclaimer ? 'Edit Disclaimer' : 'Create New Disclaimer'}</h3>
-              <button className="close-btn" onClick={resetForm}>×</button>
+              <h3>
+                {editingDisclaimer
+                  ? "Edit Disclaimer"
+                  : "Create New Disclaimer"}
+              </h3>
+              <button className="close-btn" onClick={resetForm}>
+                ×
+              </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="form">
               <div className="form-row">
                 <div className="form-group">
@@ -304,24 +326,31 @@ function ManageDisclaimer() {
                   rows="20"
                   placeholder="Enter disclaimer content here (HTML supported)"
                   required
-                  style={{ fontFamily: 'monospace', fontSize: '14px' }}
+                  style={{ fontFamily: "monospace", fontSize: "14px" }}
                 />
-                <small>You can use HTML tags for formatting (h1, h2, h3, p, ul, ol, li, strong, em, etc.)</small>
+                <small>
+                  You can use HTML tags for formatting (h1, h2, h3, p, ul, ol,
+                  li, strong, em, etc.)
+                </small>
               </div>
 
               <div className="form-actions">
-                <button type="button" onClick={resetForm} className="btn btn-secondary">
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn btn-secondary"
+                >
                   Cancel
                 </button>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="btn btn-info"
                   onClick={() => setShowPreview(formData)}
                 >
                   Preview
                 </button>
                 <button type="submit" className="btn btn-primary">
-                  {editingDisclaimer ? 'Update' : 'Create'}
+                  {editingDisclaimer ? "Update" : "Create"}
                 </button>
               </div>
             </form>
@@ -335,22 +364,27 @@ function ManageDisclaimer() {
           <div className="modal-content large">
             <div className="modal-header">
               <h3>Preview: {showPreview.title}</h3>
-              <button className="close-btn" onClick={() => setShowPreview(null)}>×</button>
+              <button
+                className="close-btn"
+                onClick={() => setShowPreview(null)}
+              >
+                ×
+              </button>
             </div>
-            <div 
+            <div
               className="terms-preview-content"
               dangerouslySetInnerHTML={{ __html: showPreview.content }}
               style={{
-                padding: '20px',
-                maxHeight: '600px',
-                overflow: 'auto',
-                background: 'white',
-                borderRadius: '8px'
+                padding: "20px",
+                maxHeight: "600px",
+                overflow: "auto",
+                background: "white",
+                borderRadius: "8px",
               }}
             />
             <div className="form-actions">
-              <button 
-                className="btn btn-primary" 
+              <button
+                className="btn btn-primary"
                 onClick={() => setShowPreview(null)}
               >
                 Close Preview
@@ -362,15 +396,17 @@ function ManageDisclaimer() {
 
       {/* Disclaimer List */}
       <div className="terms-list">
-        {disclaimers.map(disclaimerItem => (
-          <div 
-            key={disclaimerItem._id} 
-            className={`terms-card ${disclaimerItem.isActive ? 'active' : ''}`}
+        {disclaimers.map((disclaimerItem) => (
+          <div
+            key={disclaimerItem._id}
+            className={`terms-card ${disclaimerItem.isActive ? "active" : ""}`}
           >
             <div className="terms-header">
               <div>
                 <h3>{disclaimerItem.title}</h3>
-                <span className="terms-version">Version {disclaimerItem.version}</span>
+                <span className="terms-version">
+                  Version {disclaimerItem.version}
+                </span>
               </div>
               <div className="terms-badges">
                 {disclaimerItem.isActive && (
@@ -380,24 +416,38 @@ function ManageDisclaimer() {
             </div>
 
             <div className="terms-meta">
-              <div><strong>Effective Date:</strong> {new Date(disclaimerItem.effectiveDate).toLocaleDateString()}</div>
-              <div><strong>Created:</strong> {new Date(disclaimerItem.createdAt).toLocaleDateString()}</div>
+              <div>
+                <strong>Effective Date:</strong>{" "}
+                {new Date(disclaimerItem.effectiveDate).toLocaleDateString()}
+              </div>
+              <div>
+                <strong>Created:</strong>{" "}
+                {new Date(disclaimerItem.createdAt).toLocaleDateString()}
+              </div>
               {disclaimerItem.publishedAt && (
-                <div><strong>Published:</strong> {new Date(disclaimerItem.publishedAt).toLocaleDateString()}</div>
+                <div>
+                  <strong>Published:</strong>{" "}
+                  {new Date(disclaimerItem.publishedAt).toLocaleDateString()}
+                </div>
               )}
               {disclaimerItem.publishedBy && (
-                <div><strong>Published By:</strong> {disclaimerItem.publishedBy.name}</div>
+                <div>
+                  <strong>Published By:</strong>{" "}
+                  {disclaimerItem.publishedBy.name}
+                </div>
               )}
             </div>
 
             <div className="terms-content-preview">
-              <div 
-                dangerouslySetInnerHTML={{ __html: disclaimerItem.content.substring(0, 200) + '...' }}
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: disclaimerItem.content.substring(0, 200) + "...",
+                }}
               />
             </div>
 
             <div className="terms-actions">
-              <button 
+              <button
                 className="btn btn-sm btn-info"
                 onClick={() => setShowPreview(disclaimerItem)}
               >
@@ -406,19 +456,19 @@ function ManageDisclaimer() {
 
               {!disclaimerItem.isActive && (
                 <>
-                  <button 
+                  <button
                     className="btn btn-sm btn-primary"
                     onClick={() => handleEdit(disclaimerItem)}
                   >
                     Edit
                   </button>
-                  <button 
+                  <button
                     className="btn btn-sm btn-success"
                     onClick={() => handlePublish(disclaimerItem._id)}
                   >
                     Publish
                   </button>
-                  <button 
+                  <button
                     className="btn btn-sm btn-danger"
                     onClick={() => handleDelete(disclaimerItem._id)}
                   >
@@ -428,7 +478,7 @@ function ManageDisclaimer() {
               )}
 
               {disclaimerItem.isActive && (
-                <button 
+                <button
                   className="btn btn-sm btn-warning"
                   onClick={() => handleUnpublish(disclaimerItem._id)}
                 >
@@ -442,7 +492,10 @@ function ManageDisclaimer() {
 
       {disclaimers.length === 0 && (
         <div className="empty-state">
-          <p>No disclaimer versions found. Create your first disclaimer to get started.</p>
+          <p>
+            No disclaimer versions found. Create your first disclaimer to get
+            started.
+          </p>
         </div>
       )}
     </div>

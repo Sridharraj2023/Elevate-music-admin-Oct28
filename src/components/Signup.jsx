@@ -1,68 +1,72 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { showToast } from '../utils/toast';
-import './Signup.css';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { showToast } from "../utils/toast";
+import "./Signup.css";
 
 function Signup({ setUserRole }) {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
-      console.log('Signup attempt:', { name, email });
-      
+      console.log("Signup attempt:", { name, email });
+
       // Use environment variable for API URL
       const apiUrl = import.meta.env.VITE_API_URL;
-      
+
       const res = await axios.post(
         `${apiUrl}/users`,
         { name, email, password },
-        { 
+        {
           withCredentials: true,
           headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+            "Content-Type": "application/json",
+          },
+        },
       );
-      
-      console.log('Signup response:', res.data);
-      
+
+      console.log("Signup response:", res.data);
+
       if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        console.log('Token stored in localStorage');
-        showToast.success('Account created successfully!');
-        
+        localStorage.setItem("token", res.data.token);
+        console.log("Token stored in localStorage");
+        showToast.success("Account created successfully!");
+
         if (res.data.role) {
-          console.log('Setting user role:', res.data.role);
+          console.log("Setting user role:", res.data.role);
           setUserRole(res.data.role);
-          
-          if (res.data.role === 'admin') {
-            console.log('Navigating to /admin');
-            navigate('/admin');
+
+          if (res.data.role === "admin") {
+            console.log("Navigating to /admin");
+            navigate("/admin");
           } else {
-            console.log('Navigating to /user');
-            navigate('/user');
+            console.log("Navigating to /user");
+            navigate("/user");
           }
         } else {
-          console.error('No role in response');
-          throw new Error('No role received from server');
+          console.error("No role in response");
+          throw new Error("No role received from server");
         }
       } else {
-        console.error('No token in response');
-        throw new Error('No authentication token received');
+        console.error("No token in response");
+        throw new Error("No authentication token received");
       }
     } catch (err) {
-      console.error('Signup error:', err);
-      console.error('Error response:', err.response?.data);
-      
+      console.error("Signup error:", err);
+      console.error("Error response:", err.response?.data);
+
       if (err.response) {
-        if (err.response.status === 400 && err.response.data?.message === 'User already exists') {
-          const errorMsg = 'This email is already registered. Please log in instead.';
+        if (
+          err.response.status === 400 &&
+          err.response.data?.message === "User already exists"
+        ) {
+          const errorMsg =
+            "This email is already registered. Please log in instead.";
           showToast.error(errorMsg);
         } else if (err.response.data?.message) {
           showToast.error(err.response.data.message);
@@ -71,10 +75,11 @@ function Signup({ setUserRole }) {
           showToast.error(errorMsg);
         }
       } else if (err.request) {
-        const errorMsg = 'Cannot connect to the server. Please check your connection.';
+        const errorMsg =
+          "Cannot connect to the server. Please check your connection.";
         showToast.error(errorMsg);
       } else {
-        const errorMsg = 'An error occurred. Please try again.';
+        const errorMsg = "An error occurred. Please try again.";
         showToast.error(errorMsg);
       }
     }

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import './Toast.css';
+import React, { useState, useEffect } from "react";
+import "./Toast.css";
 
-const Toast = ({ message, type = 'info', duration = 5000, onClose }) => {
+const Toast = ({ message, type = "info", duration = 5000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isLeaving, setIsLeaving] = useState(false);
 
@@ -25,20 +25,20 @@ const Toast = ({ message, type = 'info', duration = 5000, onClose }) => {
 
   const getIcon = () => {
     switch (type) {
-      case 'success':
-        return '✓';
-      case 'error':
-        return '✕';
-      case 'warning':
-        return '⚠';
-      case 'info':
+      case "success":
+        return "✓";
+      case "error":
+        return "✕";
+      case "warning":
+        return "⚠";
+      case "info":
       default:
-        return 'ℹ';
+        return "ℹ";
     }
   };
 
   return (
-    <div className={`toast toast-${type} ${isLeaving ? 'toast-leaving' : ''}`}>
+    <div className={`toast toast-${type} ${isLeaving ? "toast-leaving" : ""}`}>
       <div className="toast-content">
         <span className="toast-icon">{getIcon()}</span>
         <span className="toast-message">{message}</span>

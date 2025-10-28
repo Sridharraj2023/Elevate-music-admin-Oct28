@@ -1,11 +1,11 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import '../user.css';
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import "../user.css";
 
 function UserLayout() {
   const navigate = useNavigate();
 
   const handleLoginRedirect = () => {
-    navigate('/login');
+    navigate("/login");
   };
 
   return (

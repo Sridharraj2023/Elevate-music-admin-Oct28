@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import '../admin.css';
+import { Link } from "react-router-dom";
+import "../admin.css";
 
 function Dashboard() {
   return (
@@ -14,7 +14,9 @@ function Dashboard() {
           </Link>
           <Link to="/admin/view-categories" className="module-card">
             <h4 className="module-title">View Categories</h4>
-            <p className="module-description">See all categories with options to update or delete.</p>
+            <p className="module-description">
+              See all categories with options to update or delete.
+            </p>
           </Link>
         </div>
       </div>
@@ -29,7 +31,9 @@ function Dashboard() {
           </Link>
           <Link to="/admin/view-music" className="module-card">
             <h4 className="module-title">View Music</h4>
-            <p className="module-description">See all music with options to update or delete.</p>
+            <p className="module-description">
+              See all music with options to update or delete.
+            </p>
           </Link>
         </div>
       </div>
@@ -40,7 +44,9 @@ function Dashboard() {
         <div className="dashboard-grid">
           <Link to="/admin/manage-subscription-plans" className="module-card">
             <h4 className="module-title">Manage Pricing</h4>
-            <p className="module-description">Create and manage subscription pricing plans.</p>
+            <p className="module-description">
+              Create and manage subscription pricing plans.
+            </p>
           </Link>
         </div>
       </div>
@@ -51,7 +57,9 @@ function Dashboard() {
         <div className="dashboard-grid">
           <Link to="/admin/view-users" className="module-card">
             <h4 className="module-title">View Users</h4>
-            <p className="module-description">View and manage all registered users.</p>
+            <p className="module-description">
+              View and manage all registered users.
+            </p>
           </Link>
         </div>
       </div>
@@ -62,11 +70,15 @@ function Dashboard() {
         <div className="dashboard-grid">
           <Link to="/admin/manage-terms" className="module-card">
             <h4 className="module-title">Terms & Conditions</h4>
-            <p className="module-description">Create and manage terms & conditions versions.</p>
+            <p className="module-description">
+              Create and manage terms & conditions versions.
+            </p>
           </Link>
           <Link to="/admin/manage-disclaimer" className="module-card">
             <h4 className="module-title">Disclaimer</h4>
-            <p className="module-description">Create and manage disclaimer versions.</p>
+            <p className="module-description">
+              Create and manage disclaimer versions.
+            </p>
           </Link>
         </div>
       </div>

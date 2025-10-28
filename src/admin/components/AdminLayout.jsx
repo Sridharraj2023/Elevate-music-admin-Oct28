@@ -1,20 +1,24 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import logo from '../../assets/logo.png';
-import '../admin.css';
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import logo from "../../assets/logo.png";
+import "../admin.css";
 
 function AdminLayout() {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      await axios.post(`${import.meta.env.VITE_API_URL}/users/logout`, {}, { 
-        withCredentials: true 
-      });
-      localStorage.removeItem('token');
-      navigate('/login');
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/users/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+      localStorage.removeItem("token");
+      navigate("/login");
     } catch (err) {
-      console.error('Logout error:', err);
+      console.error("Logout error:", err);
     }
   };
 
@@ -26,7 +30,11 @@ function AdminLayout() {
           <h1 className="admin-nav-brand">Elevate</h1>
         </Link>
         <ul className="admin-nav-list">
-          <li><Link to="/admin" className="admin-nav-link">Dashboard</Link></li>
+          <li>
+            <Link to="/admin" className="admin-nav-link">
+              Dashboard
+            </Link>
+          </li>
           <li>
             <button className="btn btn-danger" onClick={handleLogout}>
               Logout

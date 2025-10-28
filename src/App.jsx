@@ -1,23 +1,23 @@
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Login from './components/Login.jsx';
-import Signup from './components/Signup.jsx';
-import AdminLayout from './admin/components/AdminLayout.jsx';
-import Dashboard from './admin/pages/Dashboard.jsx';
-import AddCategory from './admin/pages/AddCategory.jsx';
-import AddMusic from './admin/pages/AddMusic.jsx';
-import ViewUsers from './admin/pages/ViewUsers.jsx';
-import ViewCategories from './admin/pages/ViewCategories.jsx';
-import ViewMusic from './admin/pages/ViewMusic.jsx';
-import ManageSubscriptionPlans from './admin/pages/ManageSubscriptionPlans.jsx';
-import ManageTermsConditions from './admin/pages/ManageTermsConditions.jsx';
-import ManageDisclaimer from './admin/pages/ManageDisclaimer.jsx';
-import UserLayout from './user/components/UserLayout.jsx';
-import UserDashboard from './user/pages/Dashboard.jsx';
-import ProtectedRoute from './components/ProtectedRoute.jsx';
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Login from "./components/Login.jsx";
+import Signup from "./components/Signup.jsx";
+import AdminLayout from "./admin/components/AdminLayout.jsx";
+import Dashboard from "./admin/pages/Dashboard.jsx";
+import AddCategory from "./admin/pages/AddCategory.jsx";
+import AddMusic from "./admin/pages/AddMusic.jsx";
+import ViewUsers from "./admin/pages/ViewUsers.jsx";
+import ViewCategories from "./admin/pages/ViewCategories.jsx";
+import ViewMusic from "./admin/pages/ViewMusic.jsx";
+import ManageSubscriptionPlans from "./admin/pages/ManageSubscriptionPlans.jsx";
+import ManageTermsConditions from "./admin/pages/ManageTermsConditions.jsx";
+import ManageDisclaimer from "./admin/pages/ManageDisclaimer.jsx";
+import UserLayout from "./user/components/UserLayout.jsx";
+import UserDashboard from "./user/pages/Dashboard.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function App() {
   const [userRole, setUserRole] = useState(null);
@@ -27,35 +27,38 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       if (
-        location.pathname === '/login' ||
-        location.pathname === '/signup' ||
-        location.pathname.startsWith('/admin') ||
-        location.pathname.startsWith('/user') ||
-        location.pathname === '/'
+        location.pathname === "/login" ||
+        location.pathname === "/signup" ||
+        location.pathname.startsWith("/admin") ||
+        location.pathname.startsWith("/user") ||
+        location.pathname === "/"
       ) {
         return;
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
         setUserRole(null);
         return;
       }
 
       try {
-        const res = await axios.get(`${import.meta.env.VITE_API_URL}/users/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        });
-        console.log('App auth check:', res.data);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/users/profile`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          },
+        );
+        console.log("App auth check:", res.data);
         setUserRole(res.data.role);
-        if (res.data.role === 'admin') {
-          navigate('/admin');
+        if (res.data.role === "admin") {
+          navigate("/admin");
         } else {
-          navigate('/user');
+          navigate("/user");
         }
       } catch (error) {
-        console.log('Not authenticated', error.response?.data);
+        console.log("Not authenticated", error.response?.data);
         setUserRole(null);
       }
     };
@@ -96,7 +99,10 @@ function App() {
           <Route path="view-categories" element={<ViewCategories />} />
           <Route path="view-music" element={<ViewMusic />} />
           <Route path="view-users" element={<ViewUsers />} />
-          <Route path="manage-subscription-plans" element={<ManageSubscriptionPlans />} />
+          <Route
+            path="manage-subscription-plans"
+            element={<ManageSubscriptionPlans />}
+          />
           <Route path="manage-terms" element={<ManageTermsConditions />} />
           <Route path="manage-disclaimer" element={<ManageDisclaimer />} />
         </Route>

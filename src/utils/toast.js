@@ -1,4 +1,4 @@
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 export const showToast = {
   success: (message) => {
@@ -53,14 +53,14 @@ export const showToast = {
     toast.dismiss(toastId);
   },
 
-  update: (toastId, message, type = 'success') => {
+  update: (toastId, message, type = "success") => {
     toast.update(toastId, {
       render: message,
       type: type,
       isLoading: false,
       autoClose: 5000,
     });
-  }
+  },
 };
 
 export default showToast;

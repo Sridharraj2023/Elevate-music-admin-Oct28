@@ -1,6 +1,6 @@
-# 📋 How to Set Disclaimer by Admin - Complete Guide
+# How to Set Disclaimer by Admin - Complete Guide
 
-## 🎯 **Step-by-Step Instructions:**
+## Step-by-Step Instructions:
 
 ### **Step 1: Access Admin Panel**
 1. **Open your browser** and go to: `http://localhost:5173/admin`
@@ -122,7 +122,7 @@ Copy and paste this HTML content into the content field:
 
 ---
 
-## 🎯 **Visual Guide:**
+## Visual Guide:
 
 ```
 Admin Dashboard
@@ -138,23 +138,23 @@ Admin Dashboard
 
 ---
 
-## ✅ **What Happens After Publishing:**
+## What Happens After Publishing:
 
 ### **Immediate Effects:**
-- ✅ Disclaimer becomes active in Flutter app
-- ✅ Users see it when clicking "Terms & Conditions" on login
-- ✅ Professional formatting with headings and lists
-- ✅ Mobile-responsive display
+- Disclaimer becomes active in Flutter app
+- Users see it when clicking "Terms & Conditions" on login
+- Professional formatting with headings and lists
+- Mobile-responsive display
 
 ### **Admin Controls:**
-- ✅ Edit existing terms anytime
-- ✅ Create new versions
-- ✅ Unpublish if needed
-- ✅ View all versions history
+- Edit existing terms anytime
+- Create new versions
+- Unpublish if needed
+- View all versions history
 
 ---
 
-## 🧪 **Testing After Setup:**
+## Testing After Setup:
 
 ### **1. Test Flutter App:**
 1. Open your Flutter app
@@ -169,7 +169,7 @@ Admin Dashboard
 
 ---
 
-## 🚨 **Important Notes:**
+## Important Notes:
 
 ### **Version Management:**
 - **Version Numbers:** Use semantic versioning (1.0, 1.1, 2.0)
@@ -183,13 +183,13 @@ Admin Dashboard
 
 ---
 
-## 🎊 **You're Done!**
+## **You're Done!**
 
 **Once you publish the disclaimer:**
-- ✅ It's live in your Flutter app
-- ✅ Users can access it from login screen
-- ✅ Professional formatting applied
-- ✅ Mobile-responsive design
-- ✅ Easy to update anytime
+- It's live in your Flutter app
+- Users can access it from login screen
+- Professional formatting applied
+- Mobile-responsive design
+- Easy to update anytime
 
-**Just follow the steps above and your disclaimer will be set up in minutes!** 🚀
+**Just follow the steps above and your disclaimer will be set up in minutes!**
