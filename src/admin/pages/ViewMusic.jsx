@@ -1,20 +1,20 @@
-import { useState, useEffect, useRef } from "react";
-import { FaPlay, FaPause } from "react-icons/fa";
-import axios from "axios";
-import { useLocation } from "react-router-dom";
-import { showToast } from "../../utils/toast";
-import "../admin.css";
-import "./ViewMusic.css";
-import BulkFileUpload from "../components/BulkFileUpload";
+import { useState, useEffect, useRef } from 'react';
+import { FaPlay, FaPause } from 'react-icons/fa';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import { showToast } from '../../utils/toast';
+import '../admin.css';
+import './ViewMusic.css';
+import BulkFileUpload from '../components/BulkFileUpload';
 
 function ViewMusic() {
   const [musicList, setMusicList] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [editTitle, setEditTitle] = useState("");
-  const [editArtist, setEditArtist] = useState("");
-  const [editCategory, setEditCategory] = useState("");
-  const [editCategoryType, setEditCategoryType] = useState("");
+  const [editTitle, setEditTitle] = useState('');
+  const [editArtist, setEditArtist] = useState('');
+  const [editCategory, setEditCategory] = useState('');
+  const [editCategoryType, setEditCategoryType] = useState('');
   const [editThumbnail, setEditThumbnail] = useState(null);
   const [editAudio, setEditAudio] = useState(null);
   const [playingId, setPlayingId] = useState(null);
@@ -22,11 +22,11 @@ function ViewMusic() {
   const [durations, setDurations] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [musicPerPage] = useState(10);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [sortOption, setSortOption] = useState("alphabetical-asc");
+  const [sortOption, setSortOption] = useState('alphabetical-asc');
   const [isLoading, setIsLoading] = useState(true);
   const [thumbnailLoading, setThumbnailLoading] = useState({});
   const [fileStatus, setFileStatus] = useState({});
@@ -39,43 +39,40 @@ function ViewMusic() {
   const loadedImagesRef = useRef(new Set());
   const location = useLocation();
   // Normalize URLs to always use the Render backend host
-  const apiBase = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
-  const filesHost = apiBase.replace(/\/api$/, "");
+  const apiBase = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const filesHost = apiBase.replace(/\/api$/, '');
   const toProd = (url) => {
     if (!url) return url;
     try {
       // If already absolute to our Render host, keep
-      if (url.startsWith("https://") || url.startsWith("http://")) {
+      if (url.startsWith('https://') || url.startsWith('http://')) {
         // Replace any local IP/host with Render host
-        return url
-          .replace(/^http:\/\/192\.168\.[0-9]+\.[0-9]+(?::[0-9]+)?/, filesHost)
-          .replace(/^http:\/\/localhost(?::[0-9]+)?/, filesHost)
-          .replace(/^http:\/\/127\.0\.0\.1(?::[0-9]+)?/, filesHost)
-          .replace(
-            /^http:\/\/([a-zA-Z0-9.-]*local[a-zA-Z0-9.-]*)(?::[0-9]+)?/,
-            filesHost,
-          )
-          .replace(/^http:\/\//, "https://");
+        return url.replace(/^http:\/\/192\.168\.[0-9]+\.[0-9]+(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/localhost(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/127\.0\.0\.1(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\/([a-zA-Z0-9.-]*local[a-zA-Z0-9.-]*)(?::[0-9]+)?/, filesHost)
+                  .replace(/^http:\/\//, 'https://');
       }
       // Relative uploads path
-      if (url.startsWith("/uploads/")) {
+      if (url.startsWith('/uploads/')) {
         return `${filesHost}${url}`;
       }
       return url;
-    } catch {
+    } catch (_) {
       return url;
     }
   };
+
 
   // Check if file exists on server
   const checkFileStatus = async (fileUrl) => {
     try {
       const fullUrl = toProd(fileUrl);
-
-      const response = await fetch(fullUrl, { method: "HEAD" });
-      return response.ok ? "exists" : "missing";
-    } catch {
-      return "error";
+      
+      const response = await fetch(fullUrl, { method: 'HEAD' });
+      return response.ok ? 'exists' : 'missing';
+    } catch (error) {
+      return 'error';
     }
   };
 
@@ -87,21 +84,19 @@ function ViewMusic() {
         statuses[music._id] = await checkFileStatus(music.fileUrl);
       }
       if (music.thumbnailUrl) {
-        statuses[`${music._id}_thumb`] = await checkFileStatus(
-          music.thumbnailUrl,
-        );
+        statuses[`${music._id}_thumb`] = await checkFileStatus(music.thumbnailUrl);
       }
     }
     setFileStatus(statuses);
   };
 
   const fetchMusic = async () => {
-    console.log("fetchMusic started, isLoading:", isLoading);
+    console.log('fetchMusic started, isLoading:', isLoading);
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        showToast.error("Please log in to view music");
+        showToast.error('Please log in to view music');
         return;
       }
       const [musicRes, categoriesRes] = await Promise.all([
@@ -116,83 +111,72 @@ function ViewMusic() {
       ]);
 
       console.log(
-        "Music data:",
-        musicRes.data.map((m) => ({
+        'Music data:',
+        musicRes.data.map(m => ({
           id: m._id,
           title: m.title,
           releaseDate: m.releaseDate,
           createdAt: m.createdAt,
           thumbnailUrl: m.thumbnailUrl,
-        })),
+        }))
       );
 
       // Warn about missing or time-less timestamps
       const missingReleaseDates = musicRes.data.filter(
-        (m) => !m.releaseDate || isNaN(new Date(m.releaseDate)),
+        m => !m.releaseDate || isNaN(new Date(m.releaseDate))
       );
       const timeLessReleaseDates = musicRes.data.filter(
-        (m) =>
-          m.releaseDate &&
-          !isNaN(new Date(m.releaseDate)) &&
-          !m.releaseDate.includes("T"),
+        m => m.releaseDate && !isNaN(new Date(m.releaseDate)) && !m.releaseDate.includes('T')
       );
       if (missingReleaseDates.length > 0) {
         console.warn(
-          "Missing or invalid releaseDate for items:",
-          missingReleaseDates.map((m) => ({ id: m._id, title: m.title })),
+          'Missing or invalid releaseDate for items:',
+          missingReleaseDates.map(m => ({ id: m._id, title: m.title }))
         );
-        showToast.warning(
-          `${missingReleaseDates.length} music items lack valid release dates, using createdAt`,
-        );
+        showToast.warning(`${missingReleaseDates.length} music items lack valid release dates, using createdAt`);
       }
       if (timeLessReleaseDates.length > 0) {
         console.warn(
-          "releaseDate lacks time component for items:",
-          timeLessReleaseDates.map((m) => ({
-            id: m._id,
-            title: m.title,
-            releaseDate: m.releaseDate,
-          })),
+          'releaseDate lacks time component for items:',
+          timeLessReleaseDates.map(m => ({ id: m._id, title: m.title, releaseDate: m.releaseDate }))
         );
-        showToast.warning(
-          `${timeLessReleaseDates.length} music items have date-only release dates, time precision may be lost`,
-        );
+        showToast.warning(`${timeLessReleaseDates.length} music items have date-only release dates, time precision may be lost`);
       }
 
       setMusicList(musicRes.data);
       setCategories(categoriesRes.data);
-
+      
       // Check file statuses after setting music list
       await checkAllFileStatuses(musicRes.data);
-
-      setCurrentTimes((prev) => ({
+      
+      setCurrentTimes(prev => ({
         ...prev,
         ...musicRes.data.reduce((acc, music) => {
           if (!(music._id in prev)) acc[music._id] = 0;
           return acc;
         }, {}),
       }));
-      setDurations((prev) => ({
+      setDurations(prev => ({
         ...prev,
         ...musicRes.data.reduce((acc, music) => {
           if (!(music._id in prev)) acc[music._id] = 0;
           return acc;
         }, {}),
       }));
-      setThumbnailLoading((prev) => ({
+      setThumbnailLoading(prev => ({
         ...prev,
         ...musicRes.data.reduce((acc, music) => {
           acc[music._id] = !loadedImagesRef.current.has(music._id);
           return acc;
         }, {}),
       }));
-      console.log("fetchMusic completed successfully");
+      console.log('fetchMusic completed successfully');
     } catch (err) {
-      console.error("Fetch music error:", err);
-      showToast.error(err.response?.data?.message || "Failed to fetch music");
+      console.error('Fetch music error:', err);
+      showToast.error(err.response?.data?.message || 'Failed to fetch music');
     } finally {
       setIsLoading(false);
-      console.log("fetchMusic finished, isLoading:", false);
+      console.log('fetchMusic finished, isLoading:', false);
     }
   };
 
@@ -202,23 +186,23 @@ function ViewMusic() {
 
   // Reset page to 1 when sortOption changes
   useEffect(() => {
-    console.log("sortOption changed:", sortOption);
+    console.log('sortOption changed:', sortOption);
     setCurrentPage(1);
   }, [sortOption]);
 
   const handleThumbnailLoad = (id) => {
     if (!loadedImagesRef.current.has(id)) {
-      console.log("Thumbnail loaded:", id);
+      console.log('Thumbnail loaded:', id);
       loadedImagesRef.current.add(id);
-      setThumbnailLoading((prev) => ({ ...prev, [id]: false }));
+      setThumbnailLoading(prev => ({ ...prev, [id]: false }));
     }
   };
 
   const handleThumbnailError = (id, e, setSrc) => {
-    console.log("Thumbnail error:", id, e);
+    console.log('Thumbnail error:', id, e);
     if (!loadedImagesRef.current.has(id)) {
       loadedImagesRef.current.add(id);
-      setThumbnailLoading((prev) => ({ ...prev, [id]: false }));
+      setThumbnailLoading(prev => ({ ...prev, [id]: false }));
       e.target.onerror = null;
       setSrc(placeholderImage);
     }
@@ -241,7 +225,7 @@ function ViewMusic() {
       const lowerQuery = query.toLowerCase();
       const suggestionSet = new Set();
 
-      musicList.forEach((music) => {
+      musicList.forEach(music => {
         if (music.title.toLowerCase().includes(lowerQuery)) {
           suggestionSet.add(`Title: ${music.title}`);
         }
@@ -267,7 +251,7 @@ function ViewMusic() {
   };
 
   const handleSuggestionClick = (suggestion) => {
-    const query = suggestion.split(": ")[1];
+    const query = suggestion.split(': ')[1];
     setSearchQuery(query);
     setShowSuggestions(false);
     setHighlightedIndex(-1);
@@ -278,26 +262,24 @@ function ViewMusic() {
   const handleKeyDown = (e) => {
     if (!showSuggestions) return;
 
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
-      setHighlightedIndex((prev) =>
-        prev < suggestions.length - 1 ? prev + 1 : prev,
-      );
-    } else if (e.key === "ArrowUp") {
+      setHighlightedIndex(prev => (prev < suggestions.length - 1 ? prev + 1 : prev));
+    } else if (e.key === 'ArrowUp') {
       e.preventDefault();
-      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
-    } else if (e.key === "Enter" && highlightedIndex >= 0) {
+      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
       handleSuggestionClick(suggestions[highlightedIndex]);
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       setShowSuggestions(false);
       setHighlightedIndex(-1);
     }
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [suggestions, highlightedIndex, showSuggestions]);
 
   useEffect(() => {
@@ -312,28 +294,28 @@ function ViewMusic() {
         setHighlightedIndex(-1);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredMusic = musicList.filter((music) => {
+  const filteredMusic = musicList.filter(music => {
     if (!searchQuery) return true;
     const lowerQuery = searchQuery.toLowerCase();
     return (
       music.title.toLowerCase().includes(lowerQuery) ||
       music.artist.toLowerCase().includes(lowerQuery) ||
-      music.category?.name.toLowerCase().includes(lowerQuery) ||
-      music.categoryType?.name.toLowerCase().includes(lowerQuery)
+      (music.category?.name.toLowerCase().includes(lowerQuery)) ||
+      (music.categoryType?.name.toLowerCase().includes(lowerQuery))
     );
   });
 
   const sortedMusic = [...filteredMusic].sort((a, b) => {
     switch (sortOption) {
-      case "alphabetical-asc":
+      case 'alphabetical-asc':
         return a.title.localeCompare(b.title);
-      case "alphabetical-desc":
+      case 'alphabetical-desc':
         return b.title.localeCompare(a.title);
-      case "newest": {
+      case 'newest': {
         // Parse timestamps
         const dateA = new Date(a.releaseDate || a.createdAt);
         const dateB = new Date(b.releaseDate || b.createdAt);
@@ -342,7 +324,7 @@ function ViewMusic() {
         // Secondary sort by title if timestamps are equal
         return timeDiff !== 0 ? timeDiff : a.title.localeCompare(b.title);
       }
-      case "oldest": {
+      case 'oldest': {
         const dateA = new Date(a.releaseDate || a.createdAt);
         const dateB = new Date(b.releaseDate || b.createdAt);
         const timeDiff = dateA.getTime() - dateB.getTime();
@@ -356,14 +338,14 @@ function ViewMusic() {
   // Log sortedMusic with parsed timestamps for debugging
   useEffect(() => {
     console.log(
-      "sortedMusic order:",
-      sortedMusic.map((m) => ({
+      'sortedMusic order:',
+      sortedMusic.map(m => ({
         id: m._id,
         title: m.title,
         releaseDate: m.releaseDate,
         createdAt: m.createdAt,
         timestamp: new Date(m.releaseDate || m.createdAt).getTime(),
-      })),
+      }))
     );
   }, [sortedMusic]);
 
@@ -371,7 +353,7 @@ function ViewMusic() {
   useEffect(() => {
     if (containerRef.current) {
       const styles = getComputedStyle(containerRef.current);
-      console.log("music-card-container styles:", {
+      console.log('music-card-container styles:', {
         display: styles.display,
         flexDirection: styles.flexDirection,
         justifyContent: styles.justifyContent,
@@ -382,25 +364,18 @@ function ViewMusic() {
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
-    const newMusicId = query.get("newMusicId");
-    if (newMusicId && musicList.length > 0 && sortOption !== "newest") {
-      const musicIndex = sortedMusic.findIndex(
-        (music) => music._id === newMusicId,
-      );
+    const newMusicId = query.get('newMusicId');
+    if (newMusicId && musicList.length > 0 && sortOption !== 'newest') {
+      const musicIndex = sortedMusic.findIndex(music => music._id === newMusicId);
       if (musicIndex !== -1) {
         const targetPage = Math.floor(musicIndex / musicPerPage) + 1;
         setCurrentPage(targetPage);
         setTimeout(() => {
-          const musicCard = document.querySelector(
-            `div[data-music-id="${newMusicId}"]`,
-          );
+          const musicCard = document.querySelector(`div[data-music-id="${newMusicId}"]`);
           if (musicCard) {
-            musicCard.scrollIntoView({ behavior: "smooth", block: "center" });
+            musicCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else if (containerRef.current) {
-            containerRef.current.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
+            containerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
         }, 100);
       }
@@ -419,26 +394,26 @@ function ViewMusic() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Are you sure you want to delete this music?")) return;
+    if (!confirm('Are you sure you want to delete this music?')) return;
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       await axios.delete(`${import.meta.env.VITE_API_URL}/music/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
-      setMusicList(musicList.filter((music) => music._id !== id));
-      setThumbnailLoading((prev) => {
+      setMusicList(musicList.filter(music => music._id !== id));
+      setThumbnailLoading(prev => {
         const newLoading = { ...prev };
         delete newLoading[id];
         return newLoading;
       });
       loadedImagesRef.current.delete(id);
-      showToast.success("Music deleted successfully!");
+      showToast.success('Music deleted successfully!');
       if (currentMusic.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       }
     } catch (err) {
-      showToast.error(err.response?.data?.message || "Failed to delete music");
+      showToast.error(err.response?.data?.message || 'Failed to delete music');
     }
   };
 
@@ -446,28 +421,25 @@ function ViewMusic() {
     setEditingId(music._id);
     setEditTitle(music.title);
     setEditArtist(music.artist);
-    setEditCategory(music.category?._id || "");
-    setEditCategoryType(music.categoryType?._id || "");
+    setEditCategory(music.category?._id || '');
+    setEditCategoryType(music.categoryType?._id || '');
     setEditThumbnail(null);
-    setThumbnailLoading((prev) => ({
-      ...prev,
-      [music._id]: !loadedImagesRef.current.has(music._id),
-    }));
+    setThumbnailLoading(prev => ({ ...prev, [music._id]: !loadedImagesRef.current.has(music._id) }));
   };
 
   const handleUpdate = async (id) => {
     let hasError = false;
 
     if (!editTitle.trim()) {
-      showToast.error("Title is required");
+      showToast.error('Title is required');
       hasError = true;
     }
     if (!editArtist.trim()) {
-      showToast.error("Artist is required");
+      showToast.error('Artist is required');
       hasError = true;
     }
     if (!editCategory) {
-      showToast.error("Category is required");
+      showToast.error('Category is required');
       hasError = true;
     }
 
@@ -476,119 +448,121 @@ function ViewMusic() {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const formData = new FormData();
+      
+      formData.append('title', editTitle);
+      formData.append('artist', editArtist);
+      formData.append('category', editCategory);
+      if (editCategoryType) formData.append('categoryType', editCategoryType);
+      if (editThumbnail) formData.append('thumbnail', editThumbnail);
+      if (editAudio) formData.append('file', editAudio);
 
-      formData.append("title", editTitle);
-      formData.append("artist", editArtist);
-      formData.append("category", editCategory);
-      if (editCategoryType) formData.append("categoryType", editCategoryType);
-      if (editThumbnail) formData.append("thumbnail", editThumbnail);
-      if (editAudio) formData.append("file", editAudio);
-
-      await axios.put(`${import.meta.env.VITE_API_URL}/music/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-        withCredentials: true,
-      });
+      await axios.put(
+        `${import.meta.env.VITE_API_URL}/music/${id}`,
+        formData,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+          withCredentials: true,
+        }
+      );
 
       await fetchMusic();
       loadedImagesRef.current.delete(id);
       setEditingId(null);
       setEditThumbnail(null);
       setEditAudio(null);
-      showToast.success("Music updated successfully!");
+      showToast.success('Music updated successfully!');
     } catch (err) {
-      showToast.error(err.response?.data?.message || "Failed to update music");
+      showToast.error(err.response?.data?.message || 'Failed to update music');
     }
   };
 
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
     setEditCategory(newCategory);
-    const selectedCategory = categories.find((cat) => cat._id === newCategory);
+    const selectedCategory = categories.find(cat => cat._id === newCategory);
     if (selectedCategory && selectedCategory.types.length > 0) {
       setEditCategoryType(selectedCategory.types[0]._id);
     } else {
-      setEditCategoryType("");
+      setEditCategoryType('');
     }
   };
 
-  const togglePlayPause = async (id) => {
-    const audio = audioRefs.current[id];
-    if (!audio) return;
+const togglePlayPause = async (id) => {
+  const audio = audioRefs.current[id];
+  if (!audio) return;
 
-    try {
-      if (playingId === id) {
-        // Pause currently playing audio
-        await audio.pause();
-        setPlayingId(null);
-      } else {
-        // Pause previous audio if it exists
-        if (playingId) {
-          const prevAudio = audioRefs.current[playingId];
-          if (prevAudio) {
-            await prevAudio.pause();
-            setCurrentTimes((prev) => ({
-              ...prev,
-              [playingId]: prevAudio.currentTime,
-            }));
+  try {
+    if (playingId === id) {
+      // Pause currently playing audio
+      await audio.pause();
+      setPlayingId(null);
+    } else {
+      // Pause previous audio if it exists
+      if (playingId) {
+        const prevAudio = audioRefs.current[playingId];
+        if (prevAudio) {
+          await prevAudio.pause();
+          setCurrentTimes(prev => ({ 
+            ...prev, 
+            [playingId]: prevAudio.currentTime 
+          }));
+        }
+      }
+      
+      // Play new audio
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        await playPromise.catch(err => {
+          // Handle specific AbortError separately
+          if (err.name !== 'AbortError') {
+            console.error('Playback error:', err);
           }
-        }
-
-        // Play new audio
-        const playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-          await playPromise.catch((err) => {
-            // Handle specific AbortError separately
-            if (err.name !== "AbortError") {
-              console.error("Playback error:", err);
-            }
-          });
-        }
-
-        setPlayingId(id);
+        });
       }
-    } catch (err) {
-      // Ignore AbortError since it's expected during rapid toggling
-      if (err.name !== "AbortError") {
-        console.error("Audio control error:", err);
-      }
+      
+      setPlayingId(id);
     }
-  };
+  } catch (err) {
+    // Ignore AbortError since it's expected during rapid toggling
+    if (err.name !== 'AbortError') {
+      console.error('Audio control error:', err);
+    }
+  }
+};
 
-  const handleTimeUpdate = (id) => {
+
+ const handleTimeUpdate = (id) => {
     const audio = audioRefs.current[id];
     if (audio) {
-      setCurrentTimes((prev) => ({ ...prev, [id]: audio.currentTime }));
+      setCurrentTimes(prev => ({ ...prev, [id]: audio.currentTime }));
     }
   };
 
   const handleLoadedMetadata = (id) => {
     const audio = audioRefs.current[id];
     if (audio && !isNaN(audio.duration) && audio.duration > 0) {
-      setDurations((prev) => ({ ...prev, [id]: audio.duration }));
+      setDurations(prev => ({ ...prev, [id]: audio.duration }));
     }
   };
 
   const formatTime = (time) => {
-    if (!time || isNaN(time)) return "0:00";
+    if (!time || isNaN(time)) return '0:00';
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  const placeholderImage =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAjWjB1QAAAABJRU5ErkJggg==";
+  const placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAjWjB1QAAAABJRU5ErkJggg==';
 
-  const selectedCategory = categories.find(
-    (cat) => cat._id === editCategory,
-  ) || { types: [] };
+  const selectedCategory = categories.find(cat => cat._id === editCategory) || { types: [] };
 
-  console.log("thumbnailLoading state:", thumbnailLoading);
+  console.log('thumbnailLoading state:', thumbnailLoading);
 
   return (
     <div className="view-music">
@@ -604,28 +578,19 @@ function ViewMusic() {
         <>
           {/* Bulk Upload Section */}
           <div className="bulk-upload-section">
-            <button
+            <button 
               onClick={() => setShowBulkUpload(!showBulkUpload)}
               className="toggle-bulk-upload-btn"
             >
-              {showBulkUpload ? "📤 Hide Bulk Upload" : "🚀 Show Bulk Upload"}
+              {showBulkUpload ? '📤 Hide Bulk Upload' : '🚀 Show Bulk Upload'}
             </button>
-            {showBulkUpload && <BulkFileUpload onUploadComplete={fetchMusic} />}
+            {showBulkUpload && (
+              <BulkFileUpload onUploadComplete={fetchMusic} />
+            )}
           </div>
-
-          <div
-            className="search-sort-container"
-            style={{
-              display: "flex",
-              gap: "20px",
-              marginBottom: "20px",
-              alignItems: "center",
-            }}
-          >
-            <div
-              className="search-container"
-              style={{ position: "relative", flex: "1" }}
-            >
+          
+          <div className="search-sort-container" style={{ display: 'flex', gap: '20px', marginBottom: '20px', alignItems: 'center' }}>
+            <div className="search-container" style={{ position: 'relative', flex: '1' }}>
               <input
                 type="text"
                 className="form-control"
@@ -641,7 +606,7 @@ function ViewMusic() {
                   {suggestions.map((suggestion, index) => (
                     <li
                       key={index}
-                      className={`suggestion-item ${index === highlightedIndex ? "highlighted" : ""}`}
+                      className={`suggestion-item ${index === highlightedIndex ? 'highlighted' : ''}`}
                       onClick={() => handleSuggestionClick(suggestion)}
                       onMouseEnter={() => setHighlightedIndex(index)}
                     >
@@ -656,7 +621,7 @@ function ViewMusic() {
                 className="form-control"
                 value={sortOption}
                 onChange={(e) => {
-                  console.log("Selected sort:", e.target.value);
+                  console.log('Selected sort:', e.target.value);
                   setSortOption(e.target.value);
                 }}
                 aria-label="Sort music"
@@ -670,9 +635,9 @@ function ViewMusic() {
             </div>
           </div>
           <div className="music-card-container" ref={containerRef}>
-            {currentMusic.map((music) => (
-              <div
-                key={music._id}
+            {currentMusic.map(music => (
+              <div 
+                key={music._id} 
                 className="music-card"
                 data-music-id={music._id}
                 ref={(el) => (musicRefs.current[music._id] = el)}
@@ -680,27 +645,17 @@ function ViewMusic() {
                 {editingId === music._id ? (
                   <div className="edit-form">
                     <div className="thumbnail-preview">
-                      <div
-                        className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? "shimmer" : ""}`}
-                      >
+                      <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                         <img
                           src={
-                            editThumbnail
+                            editThumbnail 
                               ? URL.createObjectURL(editThumbnail)
-                              : music.thumbnailUrl
-                                ? toProd(music.thumbnailUrl)
-                                : placeholderImage
+                              : (music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage)
                           }
                           alt="Thumbnail preview"
                           className="music-thumbnail"
                           onLoad={() => handleThumbnailLoad(music._id)}
-                          onError={(e) =>
-                            handleThumbnailError(
-                              music._id,
-                              e,
-                              (src) => (e.target.src = src),
-                            )
-                          }
+                          onError={(e) => handleThumbnailError(music._id, e, src => e.target.src = src)}
                         />
                       </div>
                     </div>
@@ -756,15 +711,10 @@ function ViewMusic() {
                           accept="image/*"
                           onChange={(e) => {
                             if (editThumbnail) {
-                              URL.revokeObjectURL(
-                                URL.createObjectURL(editThumbnail),
-                              );
+                              URL.revokeObjectURL(URL.createObjectURL(editThumbnail));
                             }
                             setEditThumbnail(e.target.files[0]);
-                            setThumbnailLoading((prev) => ({
-                              ...prev,
-                              [music._id]: true,
-                            }));
+                            setThumbnailLoading(prev => ({ ...prev, [music._id]: true }));
                             loadedImagesRef.current.delete(music._id);
                           }}
                         />
@@ -777,84 +727,51 @@ function ViewMusic() {
                           onChange={(e) => setEditAudio(e.target.files[0])}
                         />
                         {music.fileUrl && !editAudio && (
-                          <small>
-                            Current file: {music.fileUrl.split("/").pop()}
-                          </small>
+                          <small>Current file: {music.fileUrl.split('/').pop()}</small>
                         )}
                       </div>
                     </div>
                     <div className="edit-buttons">
-                      <button onClick={() => handleUpdate(music._id)}>
-                        Update
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingId(null);
-                          setEditThumbnail(null);
-                          setEditAudio(null);
-                          setThumbnailLoading((prev) => ({
-                            ...prev,
-                            [music._id]: !loadedImagesRef.current.has(
-                              music._id,
-                            ),
-                          }));
-                          if (editThumbnail) {
-                            URL.revokeObjectURL(
-                              URL.createObjectURL(editThumbnail),
-                            );
-                          }
-                        }}
-                      >
+                      <button onClick={() => handleUpdate(music._id)}>Update</button>
+                      <button onClick={() => {
+                        setEditingId(null);
+                        setEditThumbnail(null);
+                        setEditAudio(null);
+                        setThumbnailLoading(prev => ({ ...prev, [music._id]: !loadedImagesRef.current.has(music._id) }));
+                        if (editThumbnail) {
+                          URL.revokeObjectURL(URL.createObjectURL(editThumbnail));
+                        }
+                      }}>
                         Cancel
                       </button>
                     </div>
                   </div>
                 ) : (
                   <>
-                    <div
-                      className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? "shimmer" : ""}`}
-                    >
+                    <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={
-                          music.thumbnailUrl
-                            ? toProd(music.thumbnailUrl)
-                            : placeholderImage
-                        }
+                        src={music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}
-                        onError={(e) =>
-                          handleThumbnailError(
-                            music._id,
-                            e,
-                            (src) => (e.target.src = src),
-                          )
-                        }
+                        onError={(e) => handleThumbnailError(music._id, e, src => e.target.src = src)}
                       />
                     </div>
                     <h3>{music.title}</h3>
                     <p>Artist: {music.artist}</p>
-                    <p>Category: {music.category?.name || "Unknown"}</p>
-                    <p>Type: {music.categoryType?.name || "None"}</p>
-
+                    <p>Category: {music.category?.name || 'Unknown'}</p>
+                    <p>Type: {music.categoryType?.name || 'None'}</p>
+                    
                     {/* File Status Indicators */}
                     <div className="file-status-indicators">
                       {music.fileUrl && (
-                        <span
-                          className={`status-badge ${fileStatus[music._id] === "exists" ? "exists" : "missing"}`}
-                        >
-                          Audio:{" "}
-                          {fileStatus[music._id] === "exists" ? "✅" : "❌"}
+                        <span className={`status-badge ${fileStatus[music._id] === 'exists' ? 'exists' : 'missing'}`}>
+                          Audio: {fileStatus[music._id] === 'exists' ? '✅' : '❌'}
                         </span>
                       )}
                       {music.thumbnailUrl && (
-                        <span
-                          className={`status-badge ${fileStatus[`${music._id}_thumb`] === "exists" ? "exists" : "missing"}`}
-                        >
-                          Image:{" "}
-                          {fileStatus[`${music._id}_thumb`] === "exists"
-                            ? "✅"
-                            : "❌"}
+                        <span className={`status-badge ${fileStatus[`${music._id}_thumb`] === 'exists' ? 'exists' : 'missing'}`}>
+                          Image: {fileStatus[`${music._id}_thumb`] === 'exists' ? '✅' : '❌'}
                         </span>
                       )}
                     </div>
@@ -867,8 +784,7 @@ function ViewMusic() {
                         {playingId === music._id ? <FaPause /> : <FaPlay />}
                       </button>
                       <span className="time-display">
-                        {formatTime(currentTimes[music._id])} /{" "}
-                        {formatTime(durations[music._id])}
+                        {formatTime(currentTimes[music._id])} / {formatTime(durations[music._id])}
                       </span>
                       <input
                         type="range"
@@ -879,9 +795,9 @@ function ViewMusic() {
                           const audio = audioRefs.current[music._id];
                           if (audio) {
                             audio.currentTime = e.target.value;
-                            setCurrentTimes((prev) => ({
-                              ...prev,
-                              [music._id]: parseFloat(e.target.value),
+                            setCurrentTimes(prev => ({ 
+                              ...prev, 
+                              [music._id]: parseFloat(e.target.value) 
                             }));
                           }
                         }}
@@ -892,21 +808,10 @@ function ViewMusic() {
                         <audio
                           ref={(el) => (audioRefs.current[music._id] = el)}
                           onTimeUpdate={() => handleTimeUpdate(music._id)}
-                          onLoadedMetadata={() =>
-                            handleLoadedMetadata(music._id)
-                          }
-                          onError={(e) =>
-                            console.log(
-                              "Audio failed:",
-                              toProd(music.fileUrl),
-                              e,
-                            )
-                          }
+                          onLoadedMetadata={() => handleLoadedMetadata(music._id)}
+                          onError={(e) => console.log('Audio failed:', toProd(music.fileUrl), e)}
                         >
-                          <source
-                            src={toProd(music.fileUrl)}
-                            type="audio/mpeg"
-                          />
+                          <source src={toProd(music.fileUrl)} type="audio/mpeg" />
                           Your browser does not support the audio element.
                         </audio>
                       ) : (
@@ -915,24 +820,14 @@ function ViewMusic() {
                     </div>
                     <div className="action-buttons">
                       <button onClick={() => handleEdit(music)}>Update</button>
-                      <button onClick={() => handleDelete(music._id)}>
-                        Delete
-                      </button>
+                      <button onClick={() => handleDelete(music._id)}>Delete</button>
                     </div>
                   </>
                 )}
               </div>
             ))}
           </div>
-          <div
-            className="pagination"
-            style={{
-              marginTop: "20px",
-              display: "flex",
-              justifyContent: "center",
-              gap: "10px",
-            }}
-          >
+          <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
             <button
               className="btn btn-secondary"
               onClick={() => paginate(currentPage - 1)}
@@ -943,7 +838,7 @@ function ViewMusic() {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index + 1}
-                className={`btn ${currentPage === index + 1 ? "btn-primary" : "btn-secondary"}`}
+                className={`btn ${currentPage === index + 1 ? 'btn-primary' : 'btn-secondary'}`}
                 onClick={() => paginate(index + 1)}
               >
                 {index + 1}

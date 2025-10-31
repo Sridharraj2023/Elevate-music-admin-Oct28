@@ -1,14 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig(() => ({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   server: {
     port: 5173,
     host: true, // Allow external connections
     proxy: {
       '/api': {
-        target: 'http://172.232.30.46:5000',
+        target: process.env.VITE_API_URL || 'http://172.232.30.46:5000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'), // Keep /api in the request
       },
