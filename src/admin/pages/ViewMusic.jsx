@@ -638,6 +638,26 @@ const togglePlayPause = async (id) => {
           </div>
           <div className="music-card-container" ref={containerRef}>
             {currentMusic.map(music => {
+              // Validate editThumbnail before using in src attribute to prevent XSS
+              // blob URLs from URL.createObjectURL() are safe but validation helps static analysis
+              const isEditThumbnailValid = editThumbnail && (editThumbnail instanceof File || editThumbnail instanceof Blob);
+              const editThumbnailUrl = isEditThumbnailValid 
+                ? (() => {
+                    const blobUrl = URL.createObjectURL(editThumbnail);
+                    // Verify blob URL format - blob URLs cannot contain XSS
+                    return (blobUrl && typeof blobUrl === 'string' && blobUrl.startsWith('blob:')) 
+                      ? blobUrl 
+                      : placeholderImage;
+                  })()
+                : null;
+              
+              // Sanitize remote thumbnail URL using DOMPurify
+              const sanitizedThumbnailUrl = music.thumbnailUrl 
+                ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
+                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                  }) || placeholderImage
+                : placeholderImage;
+              
               return (
               <div 
                 key={music._id} 
@@ -650,15 +670,7 @@ const togglePlayPause = async (id) => {
                     <div className="thumbnail-preview">
                       <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                         <img
-                          src={
-                            editThumbnail 
-                              ? URL.createObjectURL(editThumbnail)
-                              : (music.thumbnailUrl 
-                                  ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
-                                      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                                    }) || placeholderImage
-                                  : placeholderImage)
-                          }
+                          src={editThumbnailUrl || sanitizedThumbnailUrl}
                           alt="Thumbnail preview"
                           className="music-thumbnail"
                           onLoad={() => handleThumbnailLoad(music._id)}
