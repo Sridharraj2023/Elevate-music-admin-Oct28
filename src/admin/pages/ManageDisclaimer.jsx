@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { showToast } from "../../utils/toast";
+import { sanitizeHtml } from "../../utils/sanitize";
 import "../admin.css";
 
 function ManageDisclaimer() {
@@ -373,7 +374,7 @@ function ManageDisclaimer() {
             </div>
             <div
               className="terms-preview-content"
-              dangerouslySetInnerHTML={{ __html: showPreview.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(showPreview.content) }}
               style={{
                 padding: "20px",
                 maxHeight: "600px",
@@ -441,7 +442,7 @@ function ManageDisclaimer() {
             <div className="terms-content-preview">
               <div
                 dangerouslySetInnerHTML={{
-                  __html: disclaimerItem.content.substring(0, 200) + "...",
+                  __html: sanitizeHtml(disclaimerItem.content.substring(0, 200) + "..."),
                 }}
               />
             </div>

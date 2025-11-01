@@ -3,6 +3,7 @@ import { FaPlay, FaPause } from 'react-icons/fa';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import { showToast } from '../../utils/toast';
+import { sanitizeUrl } from '../../utils/sanitize';
 import '../admin.css';
 import './ViewMusic.css';
 import BulkFileUpload from '../components/BulkFileUpload';
@@ -650,7 +651,7 @@ const togglePlayPause = async (id) => {
                           src={
                             editThumbnail 
                               ? URL.createObjectURL(editThumbnail)
-                              : (music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage)
+                              : (music.thumbnailUrl ? sanitizeUrl(toProd(music.thumbnailUrl)) || placeholderImage : placeholderImage)
                           }
                           alt="Thumbnail preview"
                           className="music-thumbnail"
@@ -750,7 +751,7 @@ const togglePlayPause = async (id) => {
                   <>
                     <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={music.thumbnailUrl ? toProd(music.thumbnailUrl) : placeholderImage}
+                        src={music.thumbnailUrl ? sanitizeUrl(toProd(music.thumbnailUrl)) || placeholderImage : placeholderImage}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}

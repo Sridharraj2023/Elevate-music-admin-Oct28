@@ -294,6 +294,21 @@ function ViewCategories() {
   };
 
   const handleTypeChange = (index, field, value) => {
+    // Whitelist of allowed field names to prevent prototype pollution
+    const allowedFields = ['name', 'description'];
+    
+    // Validate field name to prevent prototype pollution
+    if (!allowedFields.includes(field)) {
+      console.warn(`Attempted to set an unauthorized field: ${field}`);
+      return;
+    }
+    
+    // Explicit check for dangerous properties
+    if (field === '__proto__' || field === 'constructor' || field === 'prototype') {
+      console.warn(`Attempted prototype pollution with field: ${field}`);
+      return;
+    }
+    
     const updatedTypes = [...editTypes];
     updatedTypes[index][field] = value;
     setEditTypes(updatedTypes);

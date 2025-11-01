@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { showToast } from "../../utils/toast";
+import { sanitizeHtml } from "../../utils/sanitize";
 import "../admin.css";
 
 function ManageTermsConditions() {
@@ -328,7 +329,7 @@ function ManageTermsConditions() {
             </div>
             <div
               className="terms-preview-content"
-              dangerouslySetInnerHTML={{ __html: showPreview.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(showPreview.content) }}
               style={{
                 padding: "20px",
                 maxHeight: "600px",
@@ -395,7 +396,7 @@ function ManageTermsConditions() {
             <div className="terms-content-preview">
               <div
                 dangerouslySetInnerHTML={{
-                  __html: termsItem.content.substring(0, 200) + "...",
+                  __html: sanitizeHtml(termsItem.content.substring(0, 200) + "..."),
                 }}
               />
             </div>
