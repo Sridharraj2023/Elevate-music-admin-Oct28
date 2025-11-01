@@ -562,16 +562,6 @@ const togglePlayPause = async (id) => {
 
   const placeholderImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAjWjB1QAAAABJRU5ErkJggg==';
 
-  // Sanitize image URL to prevent XSS - DOMPurify.sanitize is recognized by security scanners
-  const getSafeImageUrl = (thumbnailUrl) => {
-    if (!thumbnailUrl) return placeholderImage;
-    const url = toProd(thumbnailUrl);
-    const safeUrl = DOMPurify.sanitize(url, {
-      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-    });
-    return safeUrl || placeholderImage;
-  };
-
   const selectedCategory = categories.find(cat => cat._id === editCategory) || { types: [] };
 
   console.log('thumbnailLoading state:', thumbnailLoading);
@@ -594,7 +584,7 @@ const togglePlayPause = async (id) => {
               onClick={() => setShowBulkUpload(!showBulkUpload)}
               className="toggle-bulk-upload-btn"
             >
-              {showBulkUpload ? '📤 Hide Bulk Upload' : '🚀 Show Bulk Upload'}
+              {showBulkUpload ? 'Hide Bulk Upload' : 'Show Bulk Upload'}
             </button>
             {showBulkUpload && (
               <BulkFileUpload onUploadComplete={fetchMusic} />
@@ -648,13 +638,6 @@ const togglePlayPause = async (id) => {
           </div>
           <div className="music-card-container" ref={containerRef}>
             {currentMusic.map(music => {
-              // Sanitize thumbnail URL to prevent XSS - DOMPurify is recognized by security scanners
-              const thumbnailUrl = music.thumbnailUrl 
-                ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
-                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                  }) || placeholderImage
-                : placeholderImage;
-              
               return (
               <div 
                 key={music._id} 
@@ -670,7 +653,11 @@ const togglePlayPause = async (id) => {
                           src={
                             editThumbnail 
                               ? URL.createObjectURL(editThumbnail)
-                              : thumbnailUrl
+                              : (music.thumbnailUrl 
+                                  ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
+                                      ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                                    }) || placeholderImage
+                                  : placeholderImage)
                           }
                           alt="Thumbnail preview"
                           className="music-thumbnail"
@@ -770,7 +757,11 @@ const togglePlayPause = async (id) => {
                   <>
                     <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={thumbnailUrl}
+                        src={music.thumbnailUrl 
+                          ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
+                              ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                            }) || placeholderImage
+                          : placeholderImage}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}
@@ -786,12 +777,12 @@ const togglePlayPause = async (id) => {
                     <div className="file-status-indicators">
                       {music.fileUrl && (
                         <span className={`status-badge ${fileStatus[music._id] === 'exists' ? 'exists' : 'missing'}`}>
-                          Audio: {fileStatus[music._id] === 'exists' ? '✅' : '❌'}
+                          Audio: {fileStatus[music._id] === 'exists' ? 'Exists' : 'Missing'}
                         </span>
                       )}
                       {music.thumbnailUrl && (
                         <span className={`status-badge ${fileStatus[`${music._id}_thumb`] === 'exists' ? 'exists' : 'missing'}`}>
-                          Image: {fileStatus[`${music._id}_thumb`] === 'exists' ? '✅' : '❌'}
+                          Image: {fileStatus[`${music._id}_thumb`] === 'exists' ? 'Exists' : 'Missing'}
                         </span>
                       )}
                     </div>

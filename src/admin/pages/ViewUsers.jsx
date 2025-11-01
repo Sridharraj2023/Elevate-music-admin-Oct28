@@ -501,14 +501,14 @@ function ViewUsers() {
                           onClick={() => viewUserDetails(user)}
                           title="View user details"
                         >
-                          👁️ View
+                          View
                         </button>
                         <button
                           className="btn btn-sm btn-danger action-btn"
                           onClick={() => handleDelete(user._id)}
                           title="Delete user"
                         >
-                          🗑️ Delete
+                          Delete
                         </button>
                       </div>
                     </td>
@@ -625,7 +625,7 @@ function ViewUsers() {
                 </p>
                 <p>
                   <strong>Auto-Debit:</strong>{" "}
-                  {selectedUser.autoDebit ? "✅ Enabled" : "❌ Disabled"}
+                  {selectedUser.autoDebit ? "Enabled" : "Disabled"}
                 </p>
                 <p>
                   <strong>Cancel at Period End:</strong>{" "}
@@ -638,14 +638,14 @@ function ViewUsers() {
                 <p>
                   <strong>Email Reminders:</strong>{" "}
                   {selectedUser.notificationPreferences?.emailReminders
-                    ? "✅ Enabled"
-                    : "❌ Disabled"}
+                    ? "Enabled"
+                    : "Disabled"}
                 </p>
                 <p>
                   <strong>Push Notifications:</strong>{" "}
                   {selectedUser.notificationPreferences?.pushNotifications
-                    ? "✅ Enabled"
-                    : "❌ Disabled"}
+                    ? "Enabled"
+                    : "Disabled"}
                 </p>
                 <p>
                   <strong>Preferred Time:</strong>{" "}
