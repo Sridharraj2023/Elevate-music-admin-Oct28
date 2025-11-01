@@ -647,7 +647,15 @@ const togglePlayPause = async (id) => {
             </div>
           </div>
           <div className="music-card-container" ref={containerRef}>
-            {currentMusic.map(music => (
+            {currentMusic.map(music => {
+              // Sanitize thumbnail URL to prevent XSS - DOMPurify is recognized by security scanners
+              const thumbnailUrl = music.thumbnailUrl 
+                ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
+                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                  }) || placeholderImage
+                : placeholderImage;
+              
+              return (
               <div 
                 key={music._id} 
                 className="music-card"
@@ -662,7 +670,7 @@ const togglePlayPause = async (id) => {
                           src={
                             editThumbnail 
                               ? URL.createObjectURL(editThumbnail)
-                              : getSafeImageUrl(music.thumbnailUrl)
+                              : thumbnailUrl
                           }
                           alt="Thumbnail preview"
                           className="music-thumbnail"
@@ -762,7 +770,7 @@ const togglePlayPause = async (id) => {
                   <>
                     <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={getSafeImageUrl(music.thumbnailUrl)}
+                        src={thumbnailUrl}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}
@@ -837,7 +845,8 @@ const togglePlayPause = async (id) => {
                   </>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
           <div className="pagination" style={{ marginTop: '20px', display: 'flex', justifyContent: 'center', gap: '10px' }}>
             <button
