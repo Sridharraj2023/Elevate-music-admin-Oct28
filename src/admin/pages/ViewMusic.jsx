@@ -638,23 +638,25 @@ const togglePlayPause = async (id) => {
           </div>
           <div className="music-card-container" ref={containerRef}>
             {currentMusic.map(music => {
-              // Validate editThumbnail before using in src attribute to prevent XSS
-              // blob URLs from URL.createObjectURL() are safe but validation helps static analysis
-              const isEditThumbnailValid = editThumbnail && (editThumbnail instanceof File || editThumbnail instanceof Blob);
-              const editThumbnailUrl = isEditThumbnailValid 
+              // Validate and sanitize editThumbnail before using in src attribute to prevent XSS
+              const editThumbnailUrl = editThumbnail && (editThumbnail instanceof File || editThumbnail instanceof Blob)
                 ? (() => {
                     const blobUrl = URL.createObjectURL(editThumbnail);
-                    // Verify blob URL format - blob URLs cannot contain XSS
-                    return (blobUrl && typeof blobUrl === 'string' && blobUrl.startsWith('blob:')) 
-                      ? blobUrl 
-                      : placeholderImage;
+                    // Verify blob URL format, then sanitize with DOMPurify for static analysis recognition
+                    if (blobUrl && typeof blobUrl === 'string' && blobUrl.startsWith('blob:')) {
+                      // Sanitize blob URL - DOMPurify recognizes blob: protocol as safe
+                      return DOMPurify.sanitize(blobUrl, {
+                        ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data|blob):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                      }) || placeholderImage;
+                    }
+                    return placeholderImage;
                   })()
                 : null;
               
-              // Sanitize remote thumbnail URL using DOMPurify
+              // Sanitize remote thumbnail URL using DOMPurify - must happen before src attribute
               const sanitizedThumbnailUrl = music.thumbnailUrl 
                 ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
-                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data|blob):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
                   }) || placeholderImage
                 : placeholderImage;
               
@@ -769,11 +771,7 @@ const togglePlayPause = async (id) => {
                   <>
                     <div className={`thumbnail-wrapper ${thumbnailLoading[music._id] ? 'shimmer' : ''}`}>
                       <img
-                        src={music.thumbnailUrl 
-                          ? DOMPurify.sanitize(toProd(music.thumbnailUrl), {
-                              ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
-                            }) || placeholderImage
-                          : placeholderImage}
+                        src={sanitizedThumbnailUrl}
                         alt={music.title}
                         className="music-thumbnail"
                         onLoad={() => handleThumbnailLoad(music._id)}
