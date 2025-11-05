@@ -17,6 +17,7 @@ function ViewMusic() {
   const [editArtist, setEditArtist] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [editCategoryType, setEditCategoryType] = useState('');
+  const [editDescription, setEditDescription] = useState('');
   const [editThumbnail, setEditThumbnail] = useState(null);
   const [editAudio, setEditAudio] = useState(null);
   const [playingId, setPlayingId] = useState(null);
@@ -425,6 +426,7 @@ function ViewMusic() {
     setEditArtist(music.artist);
     setEditCategory(music.category?._id || '');
     setEditCategoryType(music.categoryType?._id || '');
+    setEditDescription(music.description || '');
     setEditThumbnail(null);
     setThumbnailLoading(prev => ({ ...prev, [music._id]: !loadedImagesRef.current.has(music._id) }));
   };
@@ -444,6 +446,10 @@ function ViewMusic() {
       showToast.error('Category is required');
       hasError = true;
     }
+  if (editDescription && editDescription.length > 1000) {
+    showToast.error('Description must be 1000 characters or fewer');
+    hasError = true;
+  }
 
     if (hasError) {
       return;
@@ -456,6 +462,7 @@ function ViewMusic() {
       formData.append('title', editTitle);
       formData.append('artist', editArtist);
       formData.append('category', editCategory);
+      formData.append('description', (editDescription || '').trim());
       if (editCategoryType) formData.append('categoryType', editCategoryType);
       if (editThumbnail) formData.append('thumbnail', editThumbnail);
       if (editAudio) formData.append('file', editAudio);
@@ -724,6 +731,16 @@ const togglePlayPause = async (id) => {
                         ))
                       )}
                     </select>
+                    <textarea
+                      rows={4}
+                      value={editDescription}
+                      onChange={(e) => {
+                        const value = e.target.value || '';
+                        if (value.length <= 1000) setEditDescription(value);
+                      }}
+                      placeholder="Enter description (max 1000 characters)"
+                    />
+                    <small style={{ color: '#666' }}>{editDescription.length}/1000</small>
                     <div className="file-inputs">
                       <div className="file-input-group">
                         <label>Update Thumbnail (optional):</label>
@@ -782,6 +799,13 @@ const togglePlayPause = async (id) => {
                     <p>Artist: {music.artist}</p>
                     <p>Category: {music.category?.name || 'Unknown'}</p>
                     <p>Type: {music.categoryType?.name || 'None'}</p>
+                    {typeof music.description === 'string' && music.description.trim() !== '' && (
+                      <p>
+                        Description: {music.description.length > 160
+                          ? `${music.description.slice(0, 160)}...`
+                          : music.description}
+                      </p>
+                    )}
                     
                     {/* File Status Indicators */}
                     <div className="file-status-indicators">

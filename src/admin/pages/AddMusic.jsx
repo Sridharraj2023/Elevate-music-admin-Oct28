@@ -15,6 +15,7 @@ function AddMusic() {
   const [categories, setCategories] = useState([]);
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
+  const [description, setDescription] = useState("");
   const [duration, setDuration] = useState(0);
   const [displayDuration, setDisplayDuration] = useState("");
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -177,6 +178,8 @@ function AddMusic() {
     formData.append("artist", artist);
     formData.append("category", category);
     formData.append("categoryType", categoryType);
+  // send plain text description (server will sanitize again)
+  formData.append("description", description.trim());
     formData.append("file", file);
     formData.append("thumbnail", thumbnail);
     formData.append("duration", duration.toString());
@@ -297,6 +300,22 @@ function AddMusic() {
             disabled={isUploading}
             required
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Description:</label>
+          <textarea
+            className="form-control"
+            rows={4}
+            value={description}
+            onChange={(e) => {
+              const value = e.target.value || "";
+              if (value.length <= 1000) setDescription(value);
+            }}
+            placeholder="Enter a short description for this track (max 1000 characters)"
+            disabled={isUploading}
+          />
+          <small style={{ color: "#666" }}>{description.length}/1000</small>
         </div>
 
         <div className="form-group">
