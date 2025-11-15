@@ -1,0 +1,62 @@
+# Nginx configuration for Elevate Admin Frontend
+# Place this file in /etc/nginx/sites-available/elevate-admin-frontend
+# Then create a symlink: sudo ln -s /etc/nginx/sites-available/elevate-admin-frontend /etc/nginx/sites-enabled/
+# Test configuration: sudo nginx -t
+# Reload nginx: sudo systemctl reload nginx
+
+server {
+    listen 80;
+    # listen 443 ssl;  # Uncomment for HTTPS
+    
+    # Replace with your domain or IP
+    server_name 172.234.201.117;
+    # server_name your-domain.com;  # For production with domain
+    
+    # Root directory - update this path to match your deployment
+    root /home/elevatefrntend/Elevate_Admin_Frontend/frontend/dist;
+    index index.html;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml+rss application/json application/javascript;
+
+    # Security headers
+    add_header X-Frame-Options "DENY" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+
+    # Serve static files
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # API proxy (optional - if you want to proxy API requests through nginx)
+    # Uncomment if needed to proxy /api requests to backend
+    # location /api {
+    #     proxy_pass http://172.234.201.117:5000/api;
+    #     proxy_http_version 1.1;
+    #     proxy_set_header Upgrade $http_upgrade;
+    #     proxy_set_header Connection 'upgrade';
+    #     proxy_set_header Host $host;
+    #     proxy_set_header X-Real-IP $remote_addr;
+    #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    #     proxy_set_header X-Forwarded-Proto $scheme;
+    #     proxy_cache_bypass $http_upgrade;
+    # }
+
+    # SSL Configuration (uncomment for HTTPS)
+    # ssl_certificate /path/to/certificate.crt;
+    # ssl_certificate_key /path/to/private.key;
+    # ssl_protocols TLSv1.2 TLSv1.3;
+    # ssl_ciphers HIGH:!aNULL:!MD5;
+}
+

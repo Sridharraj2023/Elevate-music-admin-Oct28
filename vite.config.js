@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     host: true, // Allow external connections
     proxy: {
       '/api': {
-        target: process.env.VITE_API_URL || 'http://172.232.30.46:5000',
+        target: process.env.VITE_API_URL || 'http://172.234.201.117:5000',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'), // Keep /api in the request
       },
